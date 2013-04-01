@@ -1,0 +1,229 @@
+
+<!-- saved from url=(0039)http://www.lettvin.com/xml/xmlextrn.htm -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body>//<title>XML EXTERNS</title><!--
+// includes and macros not to be seen by HTML -->xmlextrn.h<!--
+//--><pre>/*****************************************************************************/
+// Author: Jonathan D. Lettvin
+// Date: January 2001
+/*****************************************************************************/
+//</pre><!--
+
+/*****************************************************************************/
+#if 0
+-->
+<p></p>
+<!--
+#endif
+/*****************************************************************************/
+
+// --><pre>#ifndef XMLEXTRN_H
+#define XMLEXTRN_H
+
+/*****************************************************************************/
+/* #DEFINES */
+
+#define NEW_GRAMMAR 1
+#define TEST_TYPEPOINT 0
+
+/* These defines support the lexer by implementing state data. */
+#define SHIFTMASK 2
+#define BITENTRIES (1 LS SHIFTMASK)
+#define ANDMASK (BITENTRIES-1)
+#define MATCHSTATE BITENTRIES
+
+/* These defines support the UTF8 Decoder by specifying the error states.    */
+#define UTF8____ 0x00202000L  /* UNREACHABLE TABLE ENTRY                     */
+#define UTF8_BOS 0x00201000L  /* OUT-OF-RANGE: BEFORE BEGINNING OF STRING    */
+#define UTF8_EOS 0x00200800L  /* OUT-OF-RANGE: AFTER        END OF STRING    */
+#define UTF8_BTS 0x00200400L  /* BAD TRAIL BYTE INDEXED 2 FROM RIGHT END (S) */
+#define UTF8_BT2 0x00200200L  /* BAD TRAIL BYTE INDEXED 2 FROM RIGHT END     */
+#define UTF8_BT1 0x00200100L  /* BAD TRAIL BYTE INDEXED 1 FROM RIGHT END     */
+#define UTF8_BT0 0x00200080L  /* BAD TRAIL BYTE INDEXED 0 FROM RIGHT END     */
+#define UTF8_BL4 0x00200040L  /* BAD LEAD BYTE FOR 4 BYTE ENCODING           */
+#define UTF8_BL3 0x00200020L  /* BAD LEAD BYTE FOR 3 BYTE ENCODING           */
+#define UTF8_BL2 0x00200010L  /* BAD LEAD BYTE FOR 2 BYTE ENCODING           */
+#define UTF8_BAD 0x00200008L  /* BAD LEAD BYTE (TOO HIGH)                    */
+#define UTF8_ILL 0x00200004L  /* ILLEGAL UNICODE VALUE ENCODED               */
+#define UTF8_END 0x00200002L  /* WON'T START AT END OF STRING                */
+#define UTF8_BAK 0x00200001L  /* WON'T START IN MIDDLE OF UTF8 ENCODING      */
+#define UTF8_ERR 0x00200000L  /* UNIVERSAL ERROR BIT USED IN ALL ERRORS      */
+#define UTF8_MAX 0x0010FFFFL  /* MAXIMUM ENCODABLE VALUE (not an error)      */
+
+/* This define Indexes the ASCII type table to return the type. */
+#define IDENTIFY_ASCII_TYPE(type,codepoint) {\
+    type=XMLTypeTable[14][codepoint]; }
+
+/* This define Cascade Indexes the Degenerate type table to return the type. */
+#define IDENTIFY_CODEPOINT_TYPE(type,codepoint) {\
+   u08t index=0; u32t cp=codepoint;\
+   cp*=(cp LE 0x10FFFFL);\
+   index=XMLTypeTable[index][(cp RS 14) AND 0x7f];\
+   index=XMLTypeTable[index][(cp RS  7) AND 0x7f];\
+   index=XMLTypeTable[index][(cp      ) AND 0x7f];\
+   type=index;}
+
+/* These defines support the generation and storage of HASH numbers. */
+#define HSHFT0 3
+#define HSHFT1 11
+#define HSHFT2 19
+#define HSHFT3 28
+#define HPRM 1003 /* Prime number of table entries */
+#define HASH1(T,F) {\
+ u32t tH=(T),fH=(F);tH=(tH LS HSHFT0)|(tH RS (31-HSHFT));tH^=fH;T=tH%(HPRM);}
+#define HASH(T,F,S)  {\
+  u32t tH=(T),fH=(F);tH=(tH LS S)|(tH RS (31-S));tH^=fH;T=tH%(HPRM);}
+#define HASHES(T,F) {\
+  HASH(T[0],F,HSHFT0);HASH(T[1],F,HSHFT1);\
+  HASH(T[2],F,HSHFT2);HASH(T[3],F,HSHFT3);}
+
+/*****************************************************************************/
+/* ENUMS */
+
+/* This enum supports the lexer by numbering all token types in XML. */
+enum {
+  XML_UNUSED=0,
+  XML_ERROR=1,
+  XML_ASCIIBASE=2,
+  XML_BASECHAR=3,
+  XML_IDEOGRAPHIC=4,
+  XML_NAMECHAR=5,
+  XML_ASCIIDIGIT=6,
+  XML_DIGIT=7,
+  XML_COMBINING=8,
+  XML_EXTENDER=9,
+  XML_TEXT=10,
+  XML_SPACE=11,
+  XML_PUNCT=12,
+  XML_BYTEORDERMARK=13,
+  XML_COLON=14,
+  XML_UNDERSCORE=15,
+  XML_MINUS=16,
+  XML_DOT=17,
+  XML_EXCLAMATION=18,
+  XML_DOUBLEQUOTE=19,
+  XML_POUND=20,
+  XML_DOLLAR=21,
+  XML_PERCENT=22,
+  XML_AMPERSAND=23,
+  XML_QUOTE=24,
+  XML_BACKSLASH=25,
+  XML_OPENPAREN=26,
+  XML_CLOSEPAREN=27,
+  XML_STAR=28,
+  XML_PLUS=29,
+  XML_COMMA=30,
+  XML_SLASH=31,
+  XML_SEMICOLON=32,
+  XML_LESSTHAN=33,
+  XML_EQUALS=34,
+  XML_GREATERTHAN=35,
+  XML_QUESTION=36,
+  XML_ATSIGN=37,
+  XML_OPENBRACKET=38,
+  XML_CLOSEBRACKET=39,
+  XML_TYPES
+};
+
+/* These enums support the lexer by naming state data. */
+enum { NOEOF=0, OKEOF=1 };
+enum { RESULT=0, CODEPOINT=1, TYPEPOINT=2, SUBTYPE=3 };
+enum { SM0=0, SM1=(SHIFTMASK), SM2=(SHIFTMASK*2) };
+enum { OLDCHAR=0, NEWCHAR=1 };
+
+/*****************************************************************************/
+/* TYPEDEFS */
+
+/* This type supports the UTF8 decoding by shaping the UTF8 Decoding Groups. */
+typedef struct {
+  u32t *bits_for_byte_0,*bits_for_byte_1,*bits_for_byte_2,*bits_for_byte_3;
+  s32t indices_expected;
+  u32t here_if_byte1_expected,here_if_byte2_expected,here_if_byte3_expected;
+} XMLGroupUTF8t, *XMLGroupUTF8p;
+
+/* This type supports the lexer by shaping initial input sequences and data. */
+typedef struct {
+  u16t number, length, more, offset;
+  u08t buf[8];
+  s08p type;
+} XMLIdentifyUTFt, *XMLIdentifyUTFp;
+
+/* This type supports the lexer by shaping the state data. */
+typedef struct {
+  u16t Array[BITENTRIES+1];
+  struct{ u08t Match, Next, Source, Shift, End; } Flag;
+  u08t Action[BITENTRIES+1];
+} XMLTableLEXt, *XMLTableLEXp;
+
+/* This type supports nested ENTITY definition expansion */
+typedef struct _Entry {
+  s08p Name;
+  u08p Buf;
+  u32t Size, Offset, Index;
+  u16t Change, InUse;
+  u32t Hash[4]; /* Cascading Hash Tables for fast lookup of 10^12 symbols */
+  struct _Entry *Prior;
+} Entryt, *Entryp;
+
+/* This type supports nested hash tables */
+typedef struct _Bucket {
+  u32t Used, Count; Entryp *List;
+} Buckett, *Bucketp;
+
+/* This type supports nested DTDs */
+typedef struct _Dictionary {
+  u32t Used, Count, Buckets;
+  Bucketp Bucket;
+  Entryp Entry;
+  struct _Dictionary *Prior;
+} Dictionaryt, *Dictionaryp;
+
+/* This type supports a per-file XML lexer/parser state and context. */
+typedef struct {
+  s08p Name;
+  FILE *fp;
+  struct stat Info;
+  u32t Length, Codepoint, white[1+' '];
+  Entryt Base;
+  Entryp Data;
+  Dictionaryt DTD, Entity, TagName;
+  struct {
+    u16t Number, Last, Function, Match;
+    s32t Index;
+    u32t Transform[4];
+    XMLTableLEXp XMLTableLEX;
+  } State;
+} Filet, *Filep;
+typedef void (*FileFunp)(Filep);
+
+/*****************************************************************************/
+/* EXTERN CONSTANTS */
+
+extern u32t OR_if[2];   /* Indexed mask sets all bits off, or echo set bits. */
+
+extern s08p XMLTypeName[XML_TYPES];   /* XML Token Type naming strings.      */
+extern u08t XMLTypeTable[60][128];    /* Degenerate Cascading XMLType Table. */
+extern u08t XMLTypeType[][XML_TYPES];  /* Table of Collapsed MetaType Tables.*/
+
+extern XMLGroupUTF8t XMLGroupUTF8[256];/* Table of UTF8 Decoding Groups.     */
+extern XMLIdentifyUTFt XMLIdentifyUTF[];/* Table of UTF initial string data. */
+extern XMLTableLEXt XMLTableLEX0[];   /* A demonstration lexing table.       */
+extern XMLTableLEXp XMLTableLEX;      /* Initial lexing table to be used.    */
+
+/*****************************************************************************/
+/* EXTERN FUNCTIONS */
+
+/* Generic quit function used everywhere. */
+extern void quit(Filep,s08p,...);
+extern void cleanup(Filep);
+extern u32t newlines(Filep);
+extern u32t returns(Filep);
+
+/* Functions called through pointers indexed from lex table arrays. */
+extern void data(Filep), noop(Filep), only(Filep);
+extern void name(Filep), more(Filep), crlf(Filep);
+
+/*****************************************************************************/
+/* EOF */
+#endif /* XMLEXTRN_H */
+// </pre>
+</body></html>
