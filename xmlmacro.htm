@@ -1,0 +1,267 @@
+//<HTML><HEAD><TITLE>XML MACROS</TITLE></HEAD><BODY><!--
+// includes and macros not to be seen by HTML -->xmlextrn.h<!--
+//--><PRE>
+/*****************************************************************************/
+// Author: Jonathan D. Lettvin
+// Date: January 2001
+/*****************************************************************************/
+//</PRE><!--
+
+/*****************************************************************************/
+#if 0
+-->
+<P></P>
+<!--
+#endif
+/*****************************************************************************/
+
+// --><PRE>
+#ifndef XMLMACRO_H
+#define XMLMACRO_H
+
+/* These macros are quite complex. */
+/* They rely heavily on the variable names in the functions where used. */
+/* Also, some C-style control structures are SPLIT, so beware of changes. */
+/* The reason for implementing these as macros is optimization. */
+/* A function call is expensive; requiring a stack-frame and indirection to */
+/* state data that would otherwise be direct, as well as the cost of cache  */
+/* flushes due to processor context change. */
+/* Perhaps there are better ways of implementing these. */
+/* For now, they work. */
+
+/* These macros are of four types:                                           */
+/* MACRO_UTFXX_YYYY implement the conversion of stream to Codepoint.         */
+/* CODEPOINT_UTFXX_YYYY implements the conditional fetch of a Codepoint.     */
+/* LEX_UTFXX_YYYY implements the entire lexical operation on a Codepoint.    */
+/* OTHER implement the stages of lexical operation other than fetching.      */
+/*****************************************************************************/
+#if ALL_STREAMS
+/*****************************************************************************/
+#define MACRO_UTF16__std {\
+   u32t Index=(*File.Data).Index, Over=(Index GE (*File.Data).Size);\
+   u08p Buf=(*File.Data).Buf;\
+   u16p from=(u16p)(Buf+Index);\
+   u16t lo_surrogate=((0xDC00 AND from[0])==0xD800);\
+   u16t hi_surrogate=((0xDC00 AND from[lo_surrogate])==0xDC00);\
+   u16t illegal=lo_surrogate^hi_surrogate;\
+   File.Codepoint=\
+     ((Over*UTF8_END)|\
+      (illegal*UTF8_ILL)|             /* if illegal, set value accordingly  */\
+      ((!illegal)*                    /* else if surrogate, calculate UTF32 */\
+       (( lo_surrogate*\
+	  (((((u32t)(from[0] AND 0x3FF)) LS 10)+\
+	    (from[1] AND 0x3FF))+0x10000L))|\
+	((!lo_surrogate)*from[0])))); /* else promote the UTF16 directly    */\
+   /* Increment by 1 + lo_surrogate */\
+   (*File.Data).Change=(u16t)((sizeof(u16t) LS lo_surrogate)*!Over);\
+  }
+/*****************************************************************************/
+#define MACRO_UTF16__swp {\
+   u32t Index=(*File.Data).Index, Over=(Index GE (*File.Data).Size);\
+   u08p Buf=(*File.Data).Buf;\
+   u16p from=(u16p)(Buf+Index);\
+   u16t lot=from[0], lo=((lot RS 8) AND 0xff)|((lot LS 8) AND 0xff00);\
+   u16t lo_surrogate=((0xDC00 AND lo)==0xD800);\
+   u16t hit=from[lo_surrogate];\
+   u16t hi=((hit RS 8) AND 0xff)|((hit LS 8) AND 0xff00);\
+   u16t hi_surrogate=((0xDC00 AND hi)==0xDC00);\
+   u16t illegal=lo_surrogate^hi_surrogate;\
+   File.Codepoint=\
+     ((UTF8_END*Over)|\
+      (illegal*UTF8_ILL)|             /* if illegal, set value accordingly  */\
+      ((!illegal)*                    /* else if surrogate, calculate UTF32 */\
+       ((lo_surrogate*\
+         (((((u32t)(lo AND 0x3FF)) LS 10)+(hi AND 0x3FF))+0x10000L))|\
+	((!lo_surrogate)*lo))));      /* else promote the UTF16 directly    */\
+   /* Increment by 1 + lo_surrogate */\
+   (*File.Data).Change=(u16t)((sizeof(u16t) LS lo_surrogate)*!Over);\
+  }
+/*****************************************************************************/
+#define MACRO_UTF32_1234 {\
+   u32t Index=(*File.Data).Index, Over=(Index GE (*File.Data).Size);\
+   File.Codepoint= *((u32p)((*File.Data).Buf+Index));\
+   File.Codepoint=(File.Codepoint*!Over)|(UTF8_END*Over);\
+   (*File.Data).Change=sizeof(u32t)*!Over;\
+  }
+/*****************************************************************************/
+#define MACRO_UTF32_3412 {\
+   u32t Index=(*File.Data).Index, Over=(Index GE (*File.Data).Size);\
+   File.Codepoint= *((u32p)((*File.Data).Buf+Index));\
+   File.Codepoint=(File.Codepoint*!Over)|(UTF8_END*Over);\
+   File.Codepoint=\
+     ((File.Codepoint RS 16) AND 0xffff)|\
+     ((File.Codepoint LS 16) AND 0xffff0000);\
+   (*File.Data).Change=sizeof(u32t)*!Over;\
+  }
+/*****************************************************************************/
+#define MACRO_UTF32_2143 {\
+   u32t Index=(*File.Data).Index, Over=(Index GE (*File.Data).Size);\
+   File.Codepoint= *((u32p)((*File.Data).Buf+Index));\
+   File.Codepoint=(File.Codepoint*!Over)|(UTF8_END*Over);\
+   File.Codepoint=\
+     ((File.Codepoint RS 7) AND 0xff00ff)|\
+     ((File.Codepoint LS 7) AND 0xff00ff00);\
+   (*File.Data).Change=sizeof(u32t)*!Over;\
+  }
+/*****************************************************************************/
+#define MACRO_UTF32_4321 {\
+   u32t Index=(*File.Data).Index, Over=(Index GE (*File.Data).Size);\
+   File.Codepoint= *((u32p)((*File.Data).Buf+Index));\
+   File.Codepoint=(File.Codepoint*!Over)|(UTF8_END*Over);\
+   File.Codepoint=\
+     ((File.Codepoint RS 21) AND 0xff)|\
+     ((File.Codepoint RS  7) AND 0xff00)|\
+     ((File.Codepoint LS  7) AND 0xff0000)|\
+     ((File.Codepoint LS 21) AND 0xff000000);\
+   (*File.Data).Change=sizeof(u32t)*!Over;\
+  }
+/*****************************************************************************/
+#endif
+
+#define MACRO_ASCII_guts(x,b,i) {\
+    File.Codepoint=UTF8_EOS*!x;/* Check for buffer overrun */\
+    File.Codepoint=(u32t)(x*b[i]);\
+    File.Codepoint*=!(0x80 AND File.Codepoint);/* Check for pure ASCII */\
+    IDENTIFY_ASCII_TYPE(File.State.Transform[TYPEPOINT],File.Codepoint);\
+    (*File.Data).Change=(u16t)x;\
+  }
+
+#define MACRO_ASCII__std {\
+    u32t i=(*File.Data).Index, n=(i LT (*File.Data).Size);\
+    MACRO_ASCII_guts(n,(*File.Data).Buf,i);\
+  }
+/*****************************************************************************/
+
+#define MACRO_UTF8___std {\
+   u32t Index=(u32t)(*File.Data).Index, n=(Index LT (*File.Data).Size);\
+   u08p Buf=(*File.Data).Buf, source=Buf+Index;\
+   u08t First=*Buf;\
+   u32t high_codepoint=n*(First GT 0x7f);\
+   if(!high_codepoint) {\
+     MACRO_ASCII_guts(n,Buf,Index);\
+   } else {\
+     XMLGroupUTF8p OR_from;\
+     u32t decoded_codepoint, illegal_codepoint, before_beginning_of_buffer;\
+     u32t at_end_of_buffer, beyond_end_of_buffer;\
+     s32t bytes_to_decode=0;\
+     s16t error=0, error1, error2, error3, error4;\
+     error|=error1=!n;\
+     at_end_of_buffer=OR_if[error1] AND UTF8_END;\
+     OR_from=(XMLGroupUTF8+*source);\
+     bytes_to_decode=(*OR_from).indices_expected;\
+     error|=(error2=(Index GT ((*File.Data).Size-bytes_to_decode)));\
+     beyond_end_of_buffer=OR_if[error2] AND UTF8_EOS;\
+     error|=(error3=(source+bytes_to_decode) LT Buf);\
+     before_beginning_of_buffer=OR_if[error3] AND UTF8_BOS;\
+     File.Codepoint=\
+       (*OR_from).bits_for_byte_0[source[0]]|\
+       (*OR_from).bits_for_byte_1[source[(*OR_from).here_if_byte1_expected]]|\
+       (*OR_from).bits_for_byte_2[source[(*OR_from).here_if_byte2_expected]]|\
+       (*OR_from).bits_for_byte_3[source[(*OR_from).here_if_byte3_expected]];\
+     error|=(error4=(File.Codepoint==0xFFFEL));\
+     illegal_codepoint=OR_if[error4] AND UTF8_ILL;\
+     decoded_codepoint=OR_if[!error] AND File.Codepoint;\
+     File.Codepoint=\
+       at_end_of_buffer|beyond_end_of_buffer|before_beginning_of_buffer|\
+       illegal_codepoint|decoded_codepoint;\
+     (*File.Data).Change=(u16t)(bytes_to_decode*!error);\
+     IDENTIFY_CODEPOINT_TYPE(File.State.Transform[TYPEPOINT],File.Codepoint);\
+   }\
+  }
+/*****************************************************************************/
+
+#define TRANSFORM \
+  File.State.Match=\
+   (((u32t)File.State.XMLTableLEX[File.State.Last].Flag.Match)==\
+    File.State.Transform[CODEPOINT]);\
+  File.State.Index=(u16t)(File.State.Match*MATCHSTATE);\
+  File.State.Index=(u16t)File.State.Index|((!File.State.Index)*\
+   (File.State.Transform[RESULT]=ANDMASK AND\
+    (File.State.Transform[File.State.XMLTableLEX[File.State.Last].Flag.Source]\
+     RS File.State.XMLTableLEX[File.State.Last].Flag.Shift)));
+
+#define NEW_STATE \
+  File.State.Number=(File.State.Index==MATCHSTATE)*\
+   File.State.XMLTableLEX[File.State.Last].Array[MATCHSTATE];\
+  File.State.Number=File.State.Number|((!File.State.Number)*\
+   File.State.XMLTableLEX[File.State.Last].Array[File.State.Index]);
+
+#define RUN_FUN \
+  if(0!=(File.State.Function=\
+         File.State.XMLTableLEX[File.State.Last].Action[File.State.Index]))\
+     (*Global.Chosen[File.State.Function])(FP);
+
+#define MAYBE_DONE \
+  if(!File.State.Number) {\
+    if(!File.State.XMLTableLEX[File.State.Last].Flag.End) goto kill_parse;\
+    else{\
+      if(File.Data==ADDR File.Base) goto fini_parse;\
+      else File.Data=(*File.Data).Prior;\
+    }\
+  }
+
+#define ALL_BUT_CODEPOINT TRANSFORM NEW_STATE RUN_FUN MAYBE_DONE
+
+#define ON_CODEPOINT \
+   if(File.State.XMLTableLEX[File.State.Last=File.State.Number].Flag.Next)
+
+#define RE_ASCII_CP \
+   (*File.Data).Index+=(*File.Data).Change;\
+   File.State.Transform[CODEPOINT]=File.Codepoint;\
+   File.white[(XML_SPACE==File.State.Transform[TYPEPOINT])*File.Codepoint]++;\
+   File.State.Transform[File.State.XMLTableLEX[File.State.Last].Flag.Source]=\
+     XMLTypeType[File.State.XMLTableLEX[File.State.Last].Flag.Source]\
+                [File.State.Transform[TYPEPOINT]];
+
+#define RE_UTF8__CP \
+   (*File.Data).Index+=(*File.Data).Change;\
+   File.State.Transform[CODEPOINT]=File.Codepoint;\
+   File.white[(XML_SPACE==File.State.Transform[TYPEPOINT])*File.Codepoint]++;\
+   File.State.Transform[File.State.XMLTableLEX[File.State.Last].Flag.Source]=\
+     XMLTypeType[File.State.XMLTableLEX[File.State.Last].Flag.Source]\
+                [File.State.Transform[TYPEPOINT]];
+
+#define RE_CODEPOINT \
+   (*File.Data).Index+=(*File.Data).Change;\
+   File.State.Transform[CODEPOINT]=File.Codepoint;\
+   IDENTIFY_CODEPOINT_TYPE(File.State.Transform[TYPEPOINT],File.Codepoint);\
+   File.white[(XML_SPACE==File.State.Transform[TYPEPOINT])*File.Codepoint]++;\
+   File.State.Transform[File.State.XMLTableLEX[File.State.Last].Flag.Source]=\
+     XMLTypeType[File.State.XMLTableLEX[File.State.Last].Flag.Source]\
+                [File.State.Transform[TYPEPOINT]];
+
+/*****************************************************************************/
+
+#if ALL_STREAMS
+#define CODEPOINT_UTF16__std ON_CODEPOINT { MACRO_UTF16__std; RE_CODEPOINT; }
+#define CODEPOINT_UTF16__swp ON_CODEPOINT { MACRO_UTF16__swp; RE_CODEPOINT; }
+#define CODEPOINT_UTF32_1234 ON_CODEPOINT { MACRO_UTF32_1234; RE_CODEPOINT; }
+#define CODEPOINT_UTF32_3412 ON_CODEPOINT { MACRO_UTF32_3412; RE_CODEPOINT; }
+#define CODEPOINT_UTF32_2143 ON_CODEPOINT { MACRO_UTF32_2143; RE_CODEPOINT; }
+#define CODEPOINT_UTF32_4321 ON_CODEPOINT { MACRO_UTF32_4321; RE_CODEPOINT; }
+#endif
+#define CODEPOINT_UTF8___std ON_CODEPOINT { MACRO_UTF8___std; RE_UTF8__CP; }
+#define CODEPOINT_ASCII__std ON_CODEPOINT { MACRO_ASCII__std; RE_ASCII_CP;  }
+/*****************************************************************************/
+
+#if ALL_STREAMS
+#define LEX_UTF16__std CODEPOINT_UTF16__std ALL_BUT_CODEPOINT
+#define LEX_UTF16__swp CODEPOINT_UTF16__swp ALL_BUT_CODEPOINT
+#define LEX_UTF32_1234 CODEPOINT_UTF32_1234 ALL_BUT_CODEPOINT
+#define LEX_UTF32_3412 CODEPOINT_UTF32_3412 ALL_BUT_CODEPOINT
+#define LEX_UTF32_2143 CODEPOINT_UTF32_2143 ALL_BUT_CODEPOINT
+#define LEX_UTF32_4321 CODEPOINT_UTF32_4321 ALL_BUT_CODEPOINT
+#endif
+#define LEX_UTF8___std CODEPOINT_UTF8___std ALL_BUT_CODEPOINT
+#define LEX_ASCII__std CODEPOINT_ASCII__std ALL_BUT_CODEPOINT
+/*****************************************************************************/
+
+#define FORSTATE \
+  puts(XMLIdentifyUTF[kind].type);\
+  (*File.Data).Index+=XMLIdentifyUTF[kind].offset;\
+  for(File.State.Number=1;;)
+
+/*****************************************************************************/
+/* EOF */
+#endif /* XMLMACRO_H */
+// </PRE></BODY></HTML>

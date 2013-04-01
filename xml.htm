@@ -1,0 +1,423 @@
+//<HTML><HEAD><TITLE>XML Lexer. Full Unicode support</TITLE></HEAD><BODY><!--
+// includes and macros not to be seen by HTML -->xml.c<!--
+//--><PRE>
+/*****************************************************************************/
+// Author: Jonathan D. Lettvin
+// Date: January 2001
+/*****************************************************************************/
+// This program demonstrates a method for lexing XML using massive indirection.
+// The program successfully decodes all input styles in the XML Recommendation.
+// The program handles all documented error conditions in Unicode and XML.
+// The program will implement a DFA handling every known transition in XML.
+// Currently it only handles going in and out of Name mode.
+/*****************************************************************************/
+// Indirections:
+// Decoding input styles is table-driven with cascading tables.
+// Determining Codepoint type for XML is table-driven etc...
+// State transitions are table-driven with cascading tables.
+// For a UTF8 stream up to 14 indirections are taken per Codepoint.
+/*****************************************************************************/
+// The expected NORMAL sequence followed during UTF8 lexing from a buffer:
+// . If file is long enough to be XML, continue.
+// . Loop through the 12 known stream types looking for match to first 4 bytes.
+// . Set Buffer offset after BOM and initialize State Variables.
+// . Depending on match start loop for specified decoding (shown with '+').
+// + Set previous state to current state (state means State Index).
+// + Zero Buffer Index Change.
+// + If state requires a new character (TEST):
+// +   Flag End Of Buffer and Buffer Overrun.
+// +   Check high bit on first byte and if it is 0 (TEST):
+// ++    Set Codepoint to 1st byte and Buffer Index Change to 1.
+// ++    Flag Buffer Overrun.
+// ++    Then single index Type Table, (not triple index) for Codepoint Type.
+// +   Otherwise:
+// ++    Index Decoding Group based on first byte.
+// ++    Flag Decoding Group length Buffer Overrun.
+// ++    Flag Buffer Underrun.
+// ++    Or 1st Bits of Codepoint from Decoding Group in Current Source.
+// ++    Or 2nd Bits of Codepoint from Decoding Group or 0 if no 2nd Bits.
+// ++    Or 3rd Bits of Codepoint from Decoding Group or 0 if no 3rd Bits.
+// ++    Or 4th Bits of Codepoint from Decoding Group or 0 if no 4th Bits.
+// ++    Reset Codepoint to Flagged Error Condition if present.
+// ++    Set Buffer Index Change to Decoding Group Length.
+// ++    Using Lexical Tables:
+// +++     Fetch Index of datum to transform (Codepoint, Type, or TypeType).
+// +++     Fetch datum from last state using Index.
+// +++     Fetch Right Shift from last state.
+// +++     Shift datum and Mask with the ANDMASK to convert to value 0 - 2^N-1.
+// +++     Fetch new state using datum as Index.
+// +++     If non-zero Function Number Indexed from state (TEST):
+// ++++      Run the function (could push a source on the Source Stack).
+// +++     If zero state (TEST):
+// ++++      If EOF not permitted, declare error.
+// ++++      If EOF permitted (TEST):
+// +++++       If Stacked Sources, pop to prior source.
+// +++++       If no Stacked Sources exit gracefully.
+// ++    Triple Cascade Index into Degenerate Type Table for Codepoint Type.
+// +   Set Transform Codepoint entry to Codepoint.
+// +   Set Transform Codepoint Type entry to Codepoint Type.
+// +   Fetch TypeType index from last state.
+// +   Fetch TypeType using Codepoint Type as index into TypeType table.
+// +   Set Transform Codepoint TypeType entry to Codepoint TypeType.
+// +   Set current state to value indexed by indexed transform.
+// +   Add Buffer Index Change to Buffer Index.
+// +   Continue the loop (JUMP).
+/*****************************************************************************/
+//</PRE><!--
+/*****************************************************************************/
+#if 0
+--><P></P><!--
+#endif
+// --><PRE>
+/*****************************************************************************/
+/* SPECIAL HANDLING FOR SYSTEM INCLUDES                                      */
+/* (i.e. Assist system include use of &amp;lt; and &amp;gt;)                 */
+/*****************************************************************************/
+// <BR><!--
+#include <stdio.h>     // -->#include &lt;stdio.h&gt;<BR><!--
+#include <stdlib.h>    // -->#include &lt;stdlib.h&gt;<BR><!--
+#include <memory.h>    // -->#include &lt;memory.h&gt;<BR><!--
+#include <string.h>    // -->#include &lt;string.h&gt;<BR><!--
+#include <stdarg.h>    // -->#include &lt;stdarg.h&gt;<BR><!--
+#include <sys/types.h> // -->#include &lt;sys/types.h&gt;<BR><!--
+#include <sys/stat.h>  // -->#include &lt;sys/stat.h&gt;<BR><!--
+
+// --><BR>
+/*****************************************************************************/
+/* SPECIAL CHARACTER HANDLING PERMITTING SIMULTANEOUS USE FOR C AND HTML.    */
+/* (i.e. Eliminate need to escape entities &amp;lt; &amp;gt; &amp;amp;)      */
+/*****************************************************************************/
+// <BR><!--
+#define LT <      // -->#define LT &lt;<BR><!--
+#define GT >      // -->#define GT &gt;<BR><!--
+#define LTC '<'   // -->#define LTC '&lt;'<BR><!--
+#define GTC '>'   // -->#define GTC '&gt;'<BR><!--
+#define LE <=     // -->#define LE &lt;=<BR><!--
+#define GE >=     // -->#define GE &gt;-<BR><!--
+#define LS <<     // -->#define LS &lt;&lt;<BR><!--
+#define RS >>     // -->#define RS &gt;&gt;<BR><!--
+#define LSE <<=   // -->#define LSE &lt;&lt;=<BR><!--
+#define RSE >>=   // -->#define RSE &gt;&gt;=<BR><!--
+#define AND &     // -->#define AND &amp;<BR><!--
+#define ANDAND && // -->#define ANDAND &amp;&amp;<BR><!--
+#define ADDR AND /* This obviates the need for the &amp;amp; entity in code. */
+
+// End of includes and macros not to be seen by HTML -->
+
+/*****************************************************************************/
+/* COMPILE-TIME PARAMETER CONTROLS                                           */
+/*****************************************************************************/
+#define ALL_STREAMS 1    /* Each stream lexer costs ~.5 KBytes */
+#define MULTIPLE_HASH 1  /* Support for 10^12 symbols */
+/*****************************************************************************/
+
+/*****************************************************************************/
+/* UNIVERSAL TYPEDEFS              (Key to Universal Typedefs on next line.) */
+/* s=signed, u=unsigned,  08=8-bit, 16=16-bit, 32=32-bit,  t=type, p=pointer */
+/*****************************************************************************/
+typedef          char  s08t, *s08p; /*   Signed  8-bit types */
+typedef unsigned char  u08t, *u08p; /* Unsigned  8-bit types */
+typedef          short s16t, *s16p; /*   Signed 16-bit types */
+typedef unsigned short u16t, *u16p; /* Unsigned 16-bit types */
+typedef          long  s32t, *s32p; /*   Signed 32-bit types */
+typedef unsigned long  u32t, *u32p; /* Unsigned 32-bit types */
+/*****************************************************************************/
+
+/*****************************************************************************/
+/* IMPLEMENTATION MACROS                                                     */
+/*****************************************************************************/
+//<BR><!--
+#include "xmlextrn.htm"
+//-->#include "<A HREF="xmlextrn.htm">xmlextrn.htm</A>"<BR><!--
+#include "xmlstatc.htm"
+//-->#include "<A HREF="xmlstatc.htm">xmlstatc.htm</A>"<BR><!--
+#include "xmlmacro.htm"
+//-->#include "<A HREF="xmlmacro.htm">xmlmacro.htm</A>"<BR>
+/*****************************************************************************/
+
+/*****************************************************************************/
+/* FINALIZATION FUNCTIONS                                                    */
+/*****************************************************************************/
+
+/* This function provides the general quit mechanism with cleanup. */
+void quit(Filep FP,s08p s,...) {
+  static s08p then="\x07";
+  va_list ap;
+  s16t e=0;
+  u32t position=FP?(*FP).Base.Index:0L;
+
+  puts("");
+  if(s) {
+    FP?
+      printf("ERROR([(%ld BYTE)(%ld NL)(%ld CR)]) %s: %s",
+	   position,newlines(FP),returns(FP),(*FP).Name,s):
+      printf("ERROR(%s)",s);
+    e=1;
+  }
+  va_start(ap,s);
+  while(s=va_arg(ap,s08p)) printf(" %s",s);
+  va_end(ap);
+  if(FP) cleanup(FP);
+  puts(then+1-e);
+  exit(e);
+}
+
+/* These functions will return the count of the specified whitespace. */
+u32t newlines(Filep FP) { return((*FP).white['\n']); }
+u32t returns(Filep FP) { return((*FP).white['\r']); }
+
+void cleanup(Filep FP) {
+  if((*FP).fp) fclose((*FP).fp);
+  if((*FP).Base.Buf) free((*FP).Base.Buf);
+  if((*FP).DTD.Entry) free((*FP).DTD.Entry);
+  if((*FP).Entity.Entry) free((*FP).Entity.Entry);
+  if((*FP).TagName.Entry) free((*FP).TagName.Entry);
+}
+
+void report(Filep FP) {
+  Entryp Entry=(*FP).TagName.Entry;
+  u32t Index, Used=(*FP).TagName.Used;
+  for(Index=0;Index LT Used;Index++) {
+    printf("%4ld-%-4ld\t(#%3lx,#%3lx,#%3lx,#%3lx)\n",
+           Entry[Index].Offset,Entry[Index].Size,
+	   Entry[Index].Hash[0],Entry[Index].Hash[1],
+	   Entry[Index].Hash[2],Entry[Index].Hash[3]);
+  }
+  printf("(CR=%ld),(LF=%ld)\n",returns(FP),newlines(FP));
+}
+
+/*****************************************************************************/
+/* INITIALIZATION FUNCTIONS                                                  */
+/*****************************************************************************/
+/* This function is used to initialize the global dictionary at startup. */
+void HashGlobalDictionary(void) {
+  Dictionaryp D= ADDR Global.Dictionary;
+  u32t Hash[4], Index, Used=(*D).Used;
+  u08p Buf;
+  Bucketp Bucket;
+  Entryp Entry;
+
+  for(Index=0;Index LT Used;Index++) {
+    Entry=(*D).Entry+Index;
+    Hash[0]=Hash[1]=Hash[2]=Hash[3]=0;
+    for(Buf=(*Entry).Buf;*Buf;Buf++) {
+#if MULTIPLE_HASH
+      HASHES(Hash,(u32t)*Buf);
+#else
+      HASH1(Hash[0],(u32t)*Buf);
+#endif
+    }
+    Bucket=ADDR((*D).Bucket)[Hash[0]];
+try_again:
+    if((*Bucket).Used LT (*Bucket).Count) {
+      (*Bucket).List[(*Bucket).Used]=Entry;
+      continue;
+    }
+    (*Bucket).List=(Entryp *)((!(*Bucket).Count)?
+        calloc((size_t)++((*Bucket).Count),sizeof(Bucketp)):
+        realloc((*Bucket).List,(size_t)(++((*Bucket).Count)*sizeof(Bucketp))));
+    if(!(*Bucket).List) quit(NULL,"Can't allocate bucket",NULL);
+    goto try_again;
+  }
+}
+
+/*****************************************************************************/
+/* FUNCTIONS RUN FROM STATE-TRANSITIONS                                      */
+/*****************************************************************************/
+
+/* This function displays data about the current state (for debugging). */
+void data(Filep FP) {
+  printf("\n\t#%u res=%lx cp=%lx typ=%lx sub=%lx before=%x after=%x ind=%x\n",
+    ((*FP).State).Number,
+    ((*FP).State).Transform[RESULT   ],((*FP).State).Transform[CODEPOINT],
+    ((*FP).State).Transform[TYPEPOINT],((*FP).State).Transform[SUBTYPE  ],
+    ((*FP).State).Last,((*FP).State).Number,((*FP).State).Index
+  );
+  printf("\t%s: %ld\n",(*FP).Name,(*FP).Base.Index);
+}
+/*****************************************************************************/
+
+/* This function returns a dictionary entry matching the arg entry if any. */
+Entryp Lookup(Filep FP,Entryp T) {
+  u32t Index, Size=(*T).Size, Used=(*FP).TagName.Used, *THash=(*T).Hash;
+  Entryp S=(*FP).TagName.Entry+Used;
+  u32t *SHash=(*S).Hash;
+  for(Index=Used;Used--;) {
+    S--;
+    if((*S).Size!=Size) continue;
+    if(SHash[0]!=THash[0]) continue;
+#if MULTIPLE_HASH /* Unimplemented feature */
+    if(SHash[1]!=THash[1]) continue;
+    if(SHash[2]!=THash[2]) continue;
+    if(SHash[3]!=THash[3]) continue;
+#endif
+    if(!memcmp((*S).Buf,(*T).Buf,(u16t)Size)) /* memcmp forces 16-bit len. */
+      return(S);
+  }
+  return(NULL);
+}
+
+/*****************************************************************************/
+/* FUNCTIONS RUN BY STATE ARRAY INDEXING INTO A POINTER ARRAY                */
+/*****************************************************************************/
+
+void noop(Filep FP) {}
+
+void only(Filep FP) { printf("%c",(u08t)((*FP).State).Transform[CODEPOINT]); }
+
+void name(Filep FP) { /* Start a name in the File TagName Dictionary */
+  u32t Transform, Index=(*FP).TagName.Used;
+  Entryp Add;
+  if(!Index)
+    Add=(Entryp)calloc((size_t)++((*FP).TagName).Count,sizeof(Entryt));
+  else {
+    if((*FP).TagName.Used LT (*FP).TagName.Count) {
+      Add=(*FP).TagName.Entry;
+      Index=(*FP).TagName.Used;
+    } else {
+      ++((*FP).TagName).Count;
+      Add=(Entryp)realloc((*FP).TagName.Entry,
+                  (size_t)((*FP).TagName.Count*sizeof(Entryt)));
+    }
+  }
+  memset(Add+Index,0,sizeof(Entryt));
+  (*FP).TagName.Entry=Add;
+  if(!Add) quit(FP,"Can't allocate TagName",NULL);
+  Add[Index].Offset=(*FP).Base.Index-1;
+  Add[Index].Buf=(*FP).Base.Buf+Add[Index].Offset;
+  printf("\nNAME: %c",(u08t)((*FP).State).Transform[CODEPOINT]);
+  Transform=((*FP).State).Transform[CODEPOINT];
+#if MULTIPLE_HASH
+  HASHES(Add[Index].Hash,Transform);
+#else
+  HASH1(Add[Index].Hash[0],Transform);
+#endif
+}
+
+void more(Filep FP) { /* Continue name in File TagName Dictionary */
+  Entryp Add=(*FP).TagName.Entry;
+  u32t Transform, Index=(*FP).TagName.Used;
+  Transform=((*FP).State).Transform[CODEPOINT];
+#if MULTIPLE_HASH
+  HASHES(Add[Index].Hash,Transform);
+#else
+  HASH1(Add[Index].Hash[0],Transform);
+#endif
+  printf("%c",  (u08t)((*FP).State).Transform[CODEPOINT]);
+}
+
+void crlf(Filep FP) { /* End a name in the File TagName Dictionary */
+  Entryp Comp, Mod=(*FP).TagName.Entry+(*FP).TagName.Count-1;
+  (*Mod).Size=(*FP).Base.Index-((*Mod).Offset+1);
+  Comp=Lookup(FP,Mod);
+  if(Comp) {
+    printf(" (same as %ld)\n%c",
+           (*Comp).Offset,(u08t)((*FP).State).Transform[CODEPOINT]);
+  } else {
+    if((*FP).TagName.Used LT (*FP).TagName.Count) ++((*FP).TagName.Used);
+    printf("\n%c",(u08t)((*FP).State).Transform[CODEPOINT]);
+  }
+}
+
+/*****************************************************************************/
+/* STREAM-SPECIFIC LEX FUNCTIONS                                             */
+/*****************************************************************************/
+#define LEX_FUNCTIONS 0
+
+#ifdef LEX_FUNCTIONS
+void lexASCII__std(Filep A,s16t kind) {
+  Filet File,*FP=ADDR File; memcpy(FP,A,sizeof(*A));
+  FORSTATE { LEX_ASCII__std; }
+kill_parse: quit(FP,"Bad parse",NULL);
+fini_parse: memcpy(A,FP,sizeof(*A)); report(FP); cleanup(FP); puts("\ndone");
+}
+#endif
+
+/*****************************************************************************/
+/* GENERAL STREAM-TYPE DETECTING LEX FUNCTION                                */
+/*****************************************************************************/
+
+void parse(s08p name) {
+  Filet File, *FP=ADDR File;
+  s16t i, kind;
+
+  /* Input the file and set up the access structure **************************/
+  puts("Input file");
+  memset(FP,0,sizeof(File));
+  File.Data=ADDR File.Base;
+  File.Name=name;
+  File.Entity.Prior= ADDR Global.Dictionary;
+  File.Entity.Bucket=(Bucketp)calloc(HPRM,sizeof(Buckett));
+  if(!File.Entity.Bucket) quit(ADDR File,"Can't allocate Entity Buckets",NULL);
+  printf("FILE: %s\n",File.Name);
+  if(!(File.fp=fopen(name,"rb")))
+    quit(FP,"Can't open input",NULL);
+  if(fstat(fileno(File.fp), ADDR File.Info))
+    quit(FP,"Can't stat",NULL);
+  (*File.Data).Size=File.Length=File.Info.st_size;
+  if(!((*File.Data).Buf=(u08p)malloc((size_t)(1+File.Length))))
+    quit(FP,"Can't alloc",NULL);
+  if(((size_t)File.Length)!=
+     fread((*File.Data).Buf,1,(size_t)File.Length,File.fp))
+    quit(FP,"Can't read",NULL);
+  (*File.Data).Buf[File.Length]='\0';
+  fclose(File.fp);
+  File.fp=NULL;
+  File.Base.InUse=1;
+
+  /* Determine the stream type and lex accordingly ***************************/
+  puts("\tTest stream type");
+  if(File.Length LT 16) quit(FP,"File too short (less than 16 bytes)",NULL);
+  for(i=1;XMLIdentifyUTF[i].number;i++)
+    if(!memcmp((*File.Data).Buf,XMLIdentifyUTF[i].buf,4)) break;
+
+  /* Choose the XMLTableLEX to lex *******************************************/
+  if(!(File.State.XMLTableLEX=XMLTableLEX))
+    File.State.XMLTableLEX=XMLTableLEX0;
+  kind=XMLIdentifyUTF[i].number;
+  if(UTF8_STREAM==kind) {
+    u08p s=(*File.Data).Buf;
+    u08p p=(u08p)strchr((s08p)s,GTC);
+    u08p q=(u08p)strstr((s08p)s,"US-ASCII");
+    u32t len=p?(p-s):0;
+    if(128 LT len) quit(FP,"Bad prolog",NULL);
+    kind=XMLIdentifyUTF[i].number=(q ANDAND (q LT p))?ASCIISTREAM:UTF8_STREAM;
+  }
+  switch(kind) {
+#if ALL_STREAMS
+  case 1:  FORSTATE { LEX_UTF16__std; } break;
+  case 2:  FORSTATE { LEX_UTF16__swp; } break;
+  case 3:  FORSTATE { LEX_UTF16__std; } break;
+  case 4:  FORSTATE { LEX_UTF16__swp; } break;
+  case 5:  FORSTATE { LEX_UTF32_1234; } break;
+  case 6:  FORSTATE { LEX_UTF32_3412; } break;
+  case 7:  FORSTATE { LEX_UTF32_2143; } break;
+  case 8:  FORSTATE { LEX_UTF32_4321; } break;
+  case 9:  FORSTATE { LEX_UTF32_1234; } break;
+  case 10: FORSTATE { LEX_UTF32_4321; } break;
+#endif
+  case 11: FORSTATE { LEX_UTF8___std; } break;
+  case 12: FORSTATE { LEX_UTF8___std; } break;
+  case ASCIISTREAM:
+#if LEX_FUNCTIONS
+           lexASCII__std(FP,kind); return; break;
+#else
+           FORSTATE { LEX_ASCII__std; } break;
+#endif
+  default: quit(FP,"Undocumented stream format.",NULL);  break;
+  }
+  /***************************************************************************/
+
+kill_parse: quit(FP,"Bad parse",NULL);
+fini_parse: report(FP); cleanup(FP); puts("\ndone");
+}
+
+/*****************************************************************************/
+/* MAIN FUNCTION (ENTRYPOINT)                                                */
+/*****************************************************************************/
+int main(int argc,char **argv) {
+  HashGlobalDictionary();
+  while(--argc) parse(*++argv);
+  return(0);
+}
+// </PRE></BODY></HTML>
