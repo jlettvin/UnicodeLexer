@@ -6,11 +6,13 @@ one from 2016 and one from 2001.
 
 ## 0: Highlights
 ANTLR4:
-* **__classify.g4__** ANTLR4 import grammar for codepoint classification
-* **__classify.py__** Code to generate classify.g4
-* **__wiki.g4__** Skeletal grammar importing classify.g4 for testing
-* **__Makefile__** Run this to download authoritative files and generate g4
-* **__README.md__** This file
+| FILE | CONTENTS |
+| ---- | -------- |
+| **__classify.g4__** | ANTLR4 import grammar for codepoint classification  |
+| **__classify.py__** | Code to generate classify.g4                        |
+| **__wiki.g4__**     | Skeletal grammar importing classify.g4 for testing  |
+| **__Makefile__**    | Run to download authoritative files and generate g4 |
+| **__README.md__**   | This file                                           |
 
 Historical:
 * **__2001/codepoint.py__** Hand-written modern update of tables
@@ -18,6 +20,45 @@ Historical:
 * **__2001/xmlextrn.htm__** external names of historical lexer
 * **__2001/xmlmacro.htm__** C macros implementing algorithms, historical lexer
 * **__2001/xmlstatc.htm__** hand-written tables used by historical lexer
+
+```
+$ ./classify.py --help
+classify.py
+
+Usage:
+    classify.py [-acektuz] [-v]
+    classify.py (-h | --help)
+    classify.py (--version)
+
+Options:
+    -a --showascii                  Show ASCII class/name
+    -c --showcount                  Show key counts
+    -e --enhance                    Add WS and ID rules
+    -k --showkeys                   Show key names
+    -t --showtables                 Show tables
+    -u --unittest                   Run tests
+    -z --zeroerror                  Use zero, not len
+    -v --verbose                    Show verbose output
+    -h --help                       Show this Usage message
+    --version                       Show version
+
+Concepts:
+    The authority for codepoint classification is unicode.org.
+    One file (UnicodeData.txt) is the absolute authority.
+    Each legal codepoint (Unicode character) is defined in its own line.
+    Each line is semicolon separated and its columns are not labelled.
+    A second file (UnicodeData-3.0.0) provides the correct column labels.
+    It also provides Abbreviation Descriptions for each codepoint.
+
+    Enhance (-e) causes additional rules to be moved
+    from the file wiki.g4 to the file classify.g4 where
+    they can be imported into other grammars.
+
+Author: Jonathan D. Lettvin (jlettvin@gmail.com)
+Date:   20161023 
+Legal:  Copyright(c) Jonathan D. Lettvin, All Rights Reserved
+License:GPL 3.0
+```
 
 ## 1: 2016 Automated Unicode codepoint classification ANTLR4 grammar writer.
 Python code to convert authoritative unicode.org resource files into
