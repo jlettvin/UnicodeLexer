@@ -50,10 +50,10 @@ UnicodeData-3.0.0.html: FORCE
 
 FORCE:
 
-wiki.tokens: classify.g4 wiki.g4 Makefile
+wiki.tokens: $(GRAMMARS) Makefile
 	@echo $@
 	@$(antlr4) -Dlanguage=Python2 -visitor wiki.g4
 
-classify.g4 wiki.g4: classify.py Makefile $(SOURCES)
+classify.g4 wiki.g4: classify.py $(SOURCES) Makefile
 	@echo $@
 	@./classify.py --zeroerror --enhance
