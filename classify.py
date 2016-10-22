@@ -293,12 +293,14 @@ Automatically generated Unicode codepoint classification grammar.
         return self
 
     def g4enhance(self):
+        source = "from " + Codepoint.URI["name"];
         for rule, pattern in self.combinations.iteritems():
-            self.g4rule(rule, '[ ' + pattern + ' ]', 1)
+            widened = "[ %-32s ]  // %s" % (pattern, source)
+            self.g4rule(rule, widened, 1)
         self.g4comment('End of Unicode codepoint classification', 1)
-        self.g4rule('WS', r'[ Z ]', 1)
-        self.g4rule("ID0"   , "[ L | '_' ]", 1)
-        self.g4rule('ID'    , "ID0 [ ID0 | N ] *", 1)
+        self.g4rule('WS' , '[ Z ]              // hand-written rule', 1)
+        self.g4rule("ID0", "[ L | '_' ]        // hand-written rule", 1)
+        self.g4rule('ID' , "ID0 [ ID0 | N ] *  // hand-written rule", 1)
 
     def g4wiki(self):
         """wiki.g4
