@@ -2,9 +2,20 @@ UnicodeLexer
 ============
 
 Two implementations are stored here;
-one from 2001 and one from 2016.
+one from 2016 and one from 2001.
 
-## 1: All the files with ".htm" extensions.
+## 1: 2016 Automated Unicode codepoint classification ANTLR4 grammar writer.
+Python code to convert authoritative unicode.org resource files into
+a complete and commented grammar suitable for import into other grammars.
+Similar tables are built within the python code for local testing.
+This code is new to 2016, and supersedes the 2001 code.
+
+TODO: Finish Python generation of classification table.
+This compiled table (in .c or .js JIT) may outperform
+other implementations including ANTLR4 grammar
+possibly by an order of magnitude.
+
+## 2: 2001 All the files with ".htm" extensions.
 Hand-written tables as ".htm" files
 implemented as both HTML and C code
 from 2001 with a very efficient
@@ -17,18 +28,38 @@ and to guide development of the new code.
 A small correction to the classification tables
 was made to xmlstatc.htm.
 
-## 2: Automated Unicode codepoint classification ANTLR4 grammar writer.
-Python code to convert authoritative unicode.org resource files into
-a complete and commented grammar suitable for import into other grammars.
-Similar tables are built within the python code for local testing.
-This code is new to 2016, and supersedes the 2001 code.
+1: Codepoint classification grammar
+==============
+Running make downloads unicode authoritative files,
+produces the two grammars, and roughly tests functionality.
 
-TODO: Finish Python generation of classification table.
-This compiled table (in .c or .js JIT) may outperform
-other implementations including ANTLR4 grammar
-possibly by an order of magnitude.
+Requirements:
 
-1: XML Unicode
+command-line tools:
+* antlr4
+* wget
+
+Python libraries:
+* BeautifulSoup
+* docopt
+
+The Makefile performs several important functions.
+
+Fetch/refresh local copies of unicode.org resource files:
+* UnicodeData.txt (primary data for legal codepoint values)
+* UnicodeData-3.0.0.html (column names for UnicodeData.txt)
+* Blocks.txt (classification abbreviations for blocks of codepoints)
+* PropertyValueAliases.txt (classification names for blocks)
+
+Process:
+* Extract data from resource files and construct grammars
+* Test grammars by submission to ANTLR4
+
+The resulting grammars include:
+* classify.g4 (grammar identifying all legal codepoint classifications)
+* wiki.g4 (grammar which imports classify.g4)
+
+2: old 2001 XML Unicode
 ==============
 In XML 1.0 Unicode 3.0 was employed. Unicode characters are called "codepoints".
 XML 1.0 has explicit rules for all allowed listed codepoints.
@@ -65,34 +96,3 @@ The lexer is always in a state.
 When a codepoint is submitted to the lexer it can remain in that state or change to another state.
 The possible state transitions are ordered according to probability.
 The flags of the codepoint are used to identify the state change to make.
-
-2: classify.py
-==============
-Running make downloads unicode authoritative files,
-produces the two grammars, and roughly tests functionality.
-
-Requirements:
-
-command-line tools:
-* antlr4
-* wget
-
-Python libraries:
-* BeautifulSoup
-* docopt
-
-The Makefile performs several important functions.
-
-Fetch/refresh local copies of unicode.org resource files:
-* UnicodeData.txt (primary data for legal codepoint values)
-* UnicodeData-3.0.0.html (column names for UnicodeData.txt)
-* Blocks.txt (classification abbreviations for blocks of codepoints)
-* PropertyValueAliases.txt (classification names for blocks)
-
-Process:
-* Extract data from resource files and construct grammars
-* Test grammars by submission to ANTLR4
-
-The resulting grammars include:
-* classify.g4 (grammar identifying all legal codepoint classifications)
-* wiki.g4 (grammar which imports classify.g4)
