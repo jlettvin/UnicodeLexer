@@ -12,7 +12,7 @@ ANTLR4:
 | classify.g4       | ANTLR4 import grammar for codepoint classification  |
 | classify.py       | Code to generate classify.g4                        |
 | wiki.g4           | Skeletal grammar importing classify.g4 for testing  |
-| Makefile          | Run to download authoritative files and generate g4 |
+| Makefile          | Script to download Unicode files, generate g4, test |
 | README.md         | This file                                           |
 ```
 
@@ -21,11 +21,12 @@ Historical:
 | FILE              | CONTENTS                                            |
 | ----------------- | --------------------------------------------------- |
 | 2001/codepoint.py | Hand-written modern update of tables                |
-| 2001/xml.htm      | root of historical lexer                            |
-| 2001/xmlextrn.htm | external names of historical lexer                  |
+| 2001/xml.htm      | Root of historical lexer                            |
+| 2001/xmlextrn.htm | External names of historical lexer                  |
 | 2001/xmlmacro.htm | C macros implementing algorithms, historical lexer  |
-| 2001/xmlstatc.htm | hand-written tables used by historical lexer        |
+| 2001/xmlstatc.htm | Hand-written tables used by historical lexer        |
 ```
+____
 
 ## 1: 2016 Automated Unicode codepoint classification ANTLR4 grammar writer.
 Python code to convert authoritative unicode.org resource files into
@@ -76,6 +77,7 @@ Date:   20161023
 Legal:  Copyright(c) Jonathan D. Lettvin, All Rights Reserved
 License:GPL 3.0
 ```
+____
 
 ## 2: 2001 All the files with ".htm" extensions.
 Hand-written tables as ".htm" files
@@ -89,6 +91,7 @@ This code persists for historical reasons
 and to guide development of the new code.
 A small correction to the classification tables
 was made to xmlstatc.htm.
+____
 
 1: Codepoint classification grammar
 ==============
@@ -120,6 +123,7 @@ Process:
 The resulting grammars include:
 * classify.g4 (grammar identifying all legal codepoint classifications)
 * wiki.g4 (grammar which imports classify.g4)
+____
 
 2: old 2001 XML Unicode
 ==============
