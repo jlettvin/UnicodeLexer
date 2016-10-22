@@ -69,8 +69,12 @@ The flags of the codepoint are used to identify the state change to make.
 2: classify.py
 ==============
 Requirements:
-* antlr4
-* wget
+* command-line tools
+** antlr4
+** wget
+* Python libraries
+** BeautifulSoup
+** docopt
 
 The Makefile performs several important functions.
 * Fetch/refresh local copies of unicode.org resource files
