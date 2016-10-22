@@ -27,6 +27,17 @@ Historical:
 | 2001/xmlstatc.htm | hand-written tables used by historical lexer        |
 ```
 
+## 1: 2016 Automated Unicode codepoint classification ANTLR4 grammar writer.
+Python code to convert authoritative unicode.org resource files into
+a complete and commented grammar suitable for import into other grammars.
+Similar tables are built within the python code for local testing.
+This code is new to 2016, and supersedes the 2001 code.
+
+TODO: Finish Python generation of classification table.
+This compiled table (in .c or .js JIT) may outperform
+other implementations including ANTLR4 grammar
+possibly by an order of magnitude.
+
 ```
 $ ./classify.py --help
 classify.py
@@ -65,17 +76,6 @@ Date:   20161023
 Legal:  Copyright(c) Jonathan D. Lettvin, All Rights Reserved
 License:GPL 3.0
 ```
-
-## 1: 2016 Automated Unicode codepoint classification ANTLR4 grammar writer.
-Python code to convert authoritative unicode.org resource files into
-a complete and commented grammar suitable for import into other grammars.
-Similar tables are built within the python code for local testing.
-This code is new to 2016, and supersedes the 2001 code.
-
-TODO: Finish Python generation of classification table.
-This compiled table (in .c or .js JIT) may outperform
-other implementations including ANTLR4 grammar
-possibly by an order of magnitude.
 
 ## 2: 2001 All the files with ".htm" extensions.
 Hand-written tables as ".htm" files
