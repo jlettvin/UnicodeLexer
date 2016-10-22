@@ -68,6 +68,9 @@ The flags of the codepoint are used to identify the state change to make.
 
 2: classify.py
 ==============
+Running make downloads unicode authoritative files,
+produces the two grammars, and roughly tests functionality.
+
 Requirements:
 
 command-line tools:
