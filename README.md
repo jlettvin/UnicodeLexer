@@ -70,20 +70,23 @@ The flags of the codepoint are used to identify the state change to make.
 ==============
 Requirements:
 
-command-line tools
+command-line tools:
 * antlr4
 * wget
 
-Python libraries
+Python libraries:
 * BeautifulSoup
 * docopt
 
 The Makefile performs several important functions.
-* Fetch/refresh local copies of unicode.org resource files
-** UnicodeData.txt (primary data for legal codepoint values)
-** UnicodeData-3.0.0.html (column names for UnicodeData.txt)
-** Blocks.txt (classification abbreviations for blocks of codepoints)
-** PropertyValueAliases.txt (classification names for blocks)
+
+Fetch/refresh local copies of unicode.org resource files:
+* UnicodeData.txt (primary data for legal codepoint values)
+* UnicodeData-3.0.0.html (column names for UnicodeData.txt)
+* Blocks.txt (classification abbreviations for blocks of codepoints)
+* PropertyValueAliases.txt (classification names for blocks)
+
+Process:
 * Extract data from resource files and construct grammars
 * Test grammars by submission to ANTLR4
 
