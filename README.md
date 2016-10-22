@@ -5,17 +5,19 @@ Two implementations are stored here;
 one from 2016 and one from 2001.
 
 ## 0: Highlights
-* **__classify.g4__** ANTLR4 import grammar for codepoint classification,
-* **__classify.py__** Code to generate classify.g4.
-* **__wiki.g4__** Skeletal grammar importing classify.g4 for testing.
-* **__Makefile__** Run this to download authoritative files and generate g4.
+ANTLR4:
+* **__classify.g4__** ANTLR4 import grammar for codepoint classification
+* **__classify.py__** Code to generate classify.g4
+* **__wiki.g4__** Skeletal grammar importing classify.g4 for testing
+* **__Makefile__** Run this to download authoritative files and generate g4
+* **__README.md__** This file
 
-* **__codepoint.py__** Hand-written modern update of 2001 tables.
-* **__xml.htm__** 2001 root of historical lexer.
-* **__xmlextrn.htm__** 2001 external names of historical lexer.
-* **__xmlmacro.htm__** 2001 C macros implementing algorithms, historical lexer.
-* **__xmlstatc.htm__** 2001 hand-written tables used by historical lexer.
-* **__README.md__** This file.
+Historical:
+* **__2001/codepoint.py__** Hand-written modern update of tables
+* **__2001/xml.htm__** root of historical lexer
+* **__2001/xmlextrn.htm__** external names of historical lexer
+* **__2001/xmlmacro.htm__** C macros implementing algorithms, historical lexer
+* **__2001/xmlstatc.htm__** hand-written tables used by historical lexer
 
 ## 1: 2016 Automated Unicode codepoint classification ANTLR4 grammar writer.
 Python code to convert authoritative unicode.org resource files into
