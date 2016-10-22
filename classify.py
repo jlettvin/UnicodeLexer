@@ -373,16 +373,23 @@ Automatically generated Unicode based wiki grammar."""
                 # TODO Complete table population to classify CJK characters.
                 self.test(u"Hello world\n").test(u"Hello 愚公移山。\n")
             else:
-                table = self.table['class']
+                # What to do with non-empty samples
+                T = table = self.table['class']
+                S = base  = self.base
                 print("    test: %s" % (sample))
                 for u in [ord(c) for c in sample]:
-                    a, b, c = [(u>>(7*i))&0x7f for i in range(3)]
-                    C = table[self.base][c]
-                    B = table[C][b]
-                    A = table[B][a]
-                    name = self.name[u] if u < 128 else "non-ASCII"
-                    fmt = '0x%06x %3d %3d %3d %3d %3d %2d %s %s'
-                    print(fmt % (u, c, b, a, C, B, A, self.keys[A], name))
+                    # This next line is the complete code for classifying.
+                    A = T[T[T[S][(u>>14)&0x7f]][(u>>7)&0x7f]][u&0x7f]
+                    name = self.name.get(u, "non-ASCII")
+                    print('%06x %s %s' % (u, self.keys[A], name))
+                    # The code below spreads the operation out to enable
+                    # A better grasp of the 3 stage table dereference.
+                    # a, b, c = [(u>>(7*i))&0x7f for i in range(3)]
+                    # C = table[self.base][c]
+                    # B = table[C][b]
+                    # A = table[B][a]
+                    # fmt = '0x%06x %3d %3d %3d %3d %3d %2d %s %s'
+                    # print(fmt % (u, c, b, a, C, B, A, self.keys[A], name))
         return self
 
     def shows(self):
