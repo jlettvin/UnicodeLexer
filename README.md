@@ -1,10 +1,16 @@
 UnicodeLexer
 ============
 
-C code from 2001 implementing a very efficient Universal XML Unicode stream converter
+* 1st set: all the files with ".htm" extensions.
+C code from 2001 implementing a very efficient
+Universal XML Unicode stream converter
 
+* 2nd set: an automated Unicode codepoint classification ANTLR grammar writer.
+Python code to convert authoritative unicode.org resource files into
+a complete and commented grammar suitable for import into other grammars.
 
-XML Unicode:
+1: XML Unicode
+==============
 In XML 1.0 Unicode 3.0 was employed. Unicode characters are called "codepoints".
 XML 1.0 has explicit rules for all allowed listed codepoints.
 
@@ -13,11 +19,12 @@ Unicode is defined as encoding characters as 21 bits.
 XML 1.0 streams potentially deliver these 21 bits in a countable number of variations.
 Each variation is reconstructed into a reliable 21 bit codepoint.
 The reconstruction is highly optimized for each variation on delivery.
-XML streams begin with the four characters "<xml".
+XML streams begin with the four characters "&lt;xml".
 These four characters may be packed as ASCII, UTF8, UTF16, or UTF32,
 and are sufficient to uniquely identify most stream characteristics.
-Within the first tag may be a final stream {disambiguator} found in the root tag
-<xml version="1.0" encoding="{disambiguator}">.
+Within the first tag may be a final stream {disambiguator}
+found in the root tag
+  &lt;xml version="1.0" encoding="{disambiguator}"&gt;.
 Rule 81 of the XML 1.0 specification discusses allowed disambiguators.
 
 Three 7-bit codepoint fragments:
@@ -37,3 +44,22 @@ The lexer is always in a state.
 When a codepoint is submitted to the lexer it can remain in that state or change to another state.
 The possible state transitions are ordered according to probability.
 The flags of the codepoint are used to identify the state change to make.
+
+2: classify.py
+==============
+Requirements:
+* antlr4
+* wget
+
+The Makefile performs several important functions.
+* Fetch/refresh local copies of unicode.org resource files
+** UnicodeData.txt (primary data for legal codepoint values)
+** UnicodeData-3.0.0.html (column names for UnicodeData.txt)
+** Blocks.txt (classification abbreviations for blocks of codepoints)
+** PropertyValueAliases.txt (classification names for blocks)
+* Extract data from resource files and construct grammars
+* Test grammars by submission to ANTLR4
+
+The resulting grammars include:
+* classify.g4 (grammar identifying all legal codepoint classifications)
+* wiki.g4 (grammar which imports classify.g4)
