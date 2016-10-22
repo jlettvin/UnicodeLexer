@@ -1,13 +1,24 @@
 UnicodeLexer
 ============
 
+Two implementations are stored here;
+one from 2001 and one from 2016.
+
 ## 1: All the files with ".htm" extensions.
-C code from 2001 implementing a very efficient
-Universal XML Unicode stream converter
+Hand-written tables as ".htm" files
+implemented as both HTML and C code
+from 2001 with a very efficient
+stream converter for all 13 stream types
+(variants of ASCII, UTF8, UTF16, and UTF32)
+codepoint classifier, and rudimentary
+lexer/parser for a proposed XML tree builder.
 
 ## 2: Automated Unicode codepoint classification ANTLR grammar writer.
 Python code to convert authoritative unicode.org resource files into
 a complete and commented grammar suitable for import into other grammars.
+Similar tables are built within the python code for local testing.
+
+TODO: tables built by Python may outperform other implementations.
 
 1: XML Unicode
 ==============
