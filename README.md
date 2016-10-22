@@ -27,7 +27,10 @@ Historical:
 | 2001/xmlstatc.htm | Hand-written tables used by historical lexer        |
 ```
 
-## 1: 2016 Automated Unicode codepoint classification ANTLR4 grammar writer.
+1: Codepoint classification grammar
+==============
+2016 Automated Unicode codepoint classification ANTLR4 grammar writer.
+
 Python code to convert authoritative unicode.org resource files into
 a complete and commented grammar suitable for import into other grammars.
 Similar tables are built within the python code for local testing.
@@ -77,8 +80,6 @@ Legal:  Copyright(c) Jonathan D. Lettvin, All Rights Reserved
 License:GPL 3.0
 ```
 
-1: Codepoint classification grammar
-==============
 Running make downloads unicode authoritative files,
 produces the two grammars, and roughly tests functionality.
 
@@ -108,7 +109,11 @@ The resulting grammars include:
 * classify.g4 (grammar identifying all legal codepoint classifications)
 * wiki.g4 (grammar which imports classify.g4)
 
-## 2: 2001 All the files with ".htm" extensions.
+2: old 2001 XML Unicode
+==============
+2001 directory has all historical files with ".htm" extensions
+and a Python script implementing the same tables for modern use.
+
 Hand-written tables as ".htm" files
 implemented as both HTML and C code
 from 2001 with a very efficient
@@ -121,8 +126,6 @@ and to guide development of the new code.
 A small correction to the classification tables
 was made to xmlstatc.htm.
 
-2: old 2001 XML Unicode
-==============
 In XML 1.0 Unicode 3.0 was employed. Unicode characters are called "codepoints".
 XML 1.0 has explicit rules for all allowed listed codepoints.
 
