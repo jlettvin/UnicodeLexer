@@ -110,6 +110,13 @@ The resulting grammars include:
 * classify.g4 (grammar identifying all legal codepoint classifications)
 * wiki.g4 (grammar which imports classify.g4)
 
+Once the tables internal to classify.py are finished,
+submitting a Unicode codepoint "u" to this lookup
+yields the codepoint (character) class suitable for a lexer to use.
+```
+classification = Table[Table[Table[Root][(u>>14)&0x7f]][(u>>7)&0x7f]][u&0x7f]
+```
+
 2: old 2001 XML Unicode
 =======================
 2001 directory has all historical files with ".htm" extensions
