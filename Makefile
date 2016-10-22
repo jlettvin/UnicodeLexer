@@ -1,3 +1,9 @@
+#!/usr/bin/env make
+# Author: Jonathan D. Lettvin (jlettvin@gmail.com)
+# Date:   20161023
+# Legal:  Copyright(c) Jonathan D. Lettvin, All Rights Reserved
+# License:GPL 3.0"""
+
 antlr4=java -jar /usr/local/lib/antlr-4.5.3-complete.jar
 
 FTP=ftp://ftp.unicode.org/Public/
