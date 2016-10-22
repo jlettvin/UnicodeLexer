@@ -20,6 +20,8 @@ Python code to convert authoritative unicode.org resource files into
 a complete and commented grammar suitable for import into other grammars.
 Similar tables are built within the python code for local testing.
 This code is new to 2016, and supersedes the 2001 code.
+A small correction to the classification tables
+was made to xmlstatc.htm.
 
 TODO: tables built by Python may outperform other implementations.
 
