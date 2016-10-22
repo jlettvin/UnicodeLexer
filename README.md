@@ -116,10 +116,10 @@ yields the codepoint (character) class suitable for a lexer to use.
 ```
 classification = Table[Table[Table[Base][(u>>14)&0x7f]][(u>>7)&0x7f]][u&0x7f]
 ```
-This is approximately 13 Intel instructions:
+This is approximately 11 Intel instructions in machine code:
 * 2 shifts
 * 3 masks
-* 8 dereferences
+* 6 dereferences
 
 The incomplete table already performs well for all codepoints
 but only classifies ASCII correctly.
