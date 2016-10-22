@@ -23,9 +23,9 @@ a complete and commented grammar suitable for import into other grammars.
 Similar tables are built within the python code for local testing.
 This code is new to 2016, and supersedes the 2001 code.
 
-TODO: Finish classification table in Python
-which may outperform other implementations
-including ANTLR4 grammar.
+TODO: Finish Python generation of classification table.
+This compiled table (in .c or .js JIT) may outperform
+other implementations including ANTLR4 grammar.
 
 1: XML Unicode
 ==============
