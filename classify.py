@@ -271,7 +271,7 @@ Automatically generated Unicode codepoint classification grammar.
                 v = self.keyRanges[k]
                 if k == self.errname:
                     continue
-                self.g4echo(k + ':')
+                self.g4echo('%-5s:     // %s' %(k, self.keyName[k]))
                 for i, p in enumerate(v):
                     sep = rsep[i == 0]
                     language = "[>010000] "
