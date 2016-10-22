@@ -43,7 +43,9 @@ These four characters may be packed as ASCII, UTF8, UTF16, or UTF32,
 and are sufficient to uniquely identify most stream characteristics.
 Within the first tag may be a final stream {disambiguator}
 found in the root tag
+
   &lt;xml version="1.0" encoding="{disambiguator}"&gt;.
+
 Rule 81 of the XML 1.0 specification discusses allowed disambiguators.
 
 Three 7-bit codepoint fragments:
