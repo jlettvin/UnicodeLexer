@@ -7,13 +7,13 @@ one from 2016 and one from 2001.
 ## 0: Highlights
 ANTLR4:
 ```
-| FILE | CONTENTS |
-| ---- | -------- |
-| **__classify.g4__** | ANTLR4 import grammar for codepoint classification  |
-| **__classify.py__** | Code to generate classify.g4                        |
-| **__wiki.g4__**     | Skeletal grammar importing classify.g4 for testing  |
-| **__Makefile__**    | Run to download authoritative files and generate g4 |
-| **__README.md__**   | This file                                           |
+| FILE        | CONTENTS                                            |
+| ----------- | --------------------------------------------------- |
+| classify.g4 | ANTLR4 import grammar for codepoint classification  |
+| classify.py | Code to generate classify.g4                        |
+| wiki.g4     | Skeletal grammar importing classify.g4 for testing  |
+| Makefile    | Run to download authoritative files and generate g4 |
+| README.md   | This file                                           |
 ```
 
 Historical:
