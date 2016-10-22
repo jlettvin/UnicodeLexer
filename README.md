@@ -12,11 +12,14 @@ stream converter for all 13 stream types
 (variants of ASCII, UTF8, UTF16, and UTF32)
 codepoint classifier, and rudimentary
 lexer/parser for a proposed XML tree builder.
+This code persists for historical reasons
+and to guide development of the new code.
 
-## 2: Automated Unicode codepoint classification ANTLR grammar writer.
+## 2: Automated Unicode codepoint classification ANTLR4 grammar writer.
 Python code to convert authoritative unicode.org resource files into
 a complete and commented grammar suitable for import into other grammars.
 Similar tables are built within the python code for local testing.
+This code is new to 2016, and supersedes the 2001 code.
 
 TODO: tables built by Python may outperform other implementations.
 
