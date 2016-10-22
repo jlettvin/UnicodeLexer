@@ -26,7 +26,6 @@ Historical:
 | 2001/xmlmacro.htm | C macros implementing algorithms, historical lexer  |
 | 2001/xmlstatc.htm | Hand-written tables used by historical lexer        |
 ```
-____
 
 ## 1: 2016 Automated Unicode codepoint classification ANTLR4 grammar writer.
 Python code to convert authoritative unicode.org resource files into
@@ -77,21 +76,6 @@ Date:   20161023
 Legal:  Copyright(c) Jonathan D. Lettvin, All Rights Reserved
 License:GPL 3.0
 ```
-____
-
-## 2: 2001 All the files with ".htm" extensions.
-Hand-written tables as ".htm" files
-implemented as both HTML and C code
-from 2001 with a very efficient
-stream converter for all 13 stream types
-(variants of ASCII, UTF8, UTF16, and UTF32)
-codepoint classifier, and rudimentary
-lexer/parser for a proposed XML tree builder.
-This code persists for historical reasons
-and to guide development of the new code.
-A small correction to the classification tables
-was made to xmlstatc.htm.
-____
 
 1: Codepoint classification grammar
 ==============
@@ -123,7 +107,19 @@ Process:
 The resulting grammars include:
 * classify.g4 (grammar identifying all legal codepoint classifications)
 * wiki.g4 (grammar which imports classify.g4)
-____
+
+## 2: 2001 All the files with ".htm" extensions.
+Hand-written tables as ".htm" files
+implemented as both HTML and C code
+from 2001 with a very efficient
+stream converter for all 13 stream types
+(variants of ASCII, UTF8, UTF16, and UTF32)
+codepoint classifier, and rudimentary
+lexer/parser for a proposed XML tree builder.
+This code persists for historical reasons
+and to guide development of the new code.
+A small correction to the classification tables
+was made to xmlstatc.htm.
 
 2: old 2001 XML Unicode
 ==============
