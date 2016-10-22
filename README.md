@@ -6,6 +6,7 @@ one from 2016 and one from 2001.
 
 ## 0: Highlights
 ANTLR4:
+```
 | FILE | CONTENTS |
 | ---- | -------- |
 | **__classify.g4__** | ANTLR4 import grammar for codepoint classification  |
@@ -13,6 +14,7 @@ ANTLR4:
 | **__wiki.g4__**     | Skeletal grammar importing classify.g4 for testing  |
 | **__Makefile__**    | Run to download authoritative files and generate g4 |
 | **__README.md__**   | This file                                           |
+```
 
 Historical:
 * **__2001/codepoint.py__** Hand-written modern update of tables
