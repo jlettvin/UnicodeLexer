@@ -23,7 +23,7 @@ a complete and commented grammar suitable for import into other grammars.
 Similar tables are built within the python code for local testing.
 This code is new to 2016, and supersedes the 2001 code.
 
-TODO: build classification table in Python
+TODO: Finish classification table in Python
 which may outperform other implementations
 including ANTLR4 grammar.
 
