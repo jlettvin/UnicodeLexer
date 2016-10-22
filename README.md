@@ -7,21 +7,25 @@ one from 2016 and one from 2001.
 ## 0: Highlights
 ANTLR4:
 ```
-| FILE        | CONTENTS                                            |
-| ----------- | --------------------------------------------------- |
-| classify.g4 | ANTLR4 import grammar for codepoint classification  |
-| classify.py | Code to generate classify.g4                        |
-| wiki.g4     | Skeletal grammar importing classify.g4 for testing  |
-| Makefile    | Run to download authoritative files and generate g4 |
-| README.md   | This file                                           |
+| FILE              | CONTENTS                                            |
+| ----------------- | --------------------------------------------------- |
+| classify.g4       | ANTLR4 import grammar for codepoint classification  |
+| classify.py       | Code to generate classify.g4                        |
+| wiki.g4           | Skeletal grammar importing classify.g4 for testing  |
+| Makefile          | Run to download authoritative files and generate g4 |
+| README.md         | This file                                           |
 ```
 
 Historical:
-* **__2001/codepoint.py__** Hand-written modern update of tables
-* **__2001/xml.htm__** root of historical lexer
-* **__2001/xmlextrn.htm__** external names of historical lexer
-* **__2001/xmlmacro.htm__** C macros implementing algorithms, historical lexer
-* **__2001/xmlstatc.htm__** hand-written tables used by historical lexer
+```
+| FILE              | CONTENTS                                            |
+| ----------------- | --------------------------------------------------- |
+| 2001/codepoint.py | Hand-written modern update of tables                |
+| 2001/xml.htm      | root of historical lexer                            |
+| 2001/xmlextrn.htm | external names of historical lexer                  |
+| 2001/xmlmacro.htm | C macros implementing algorithms, historical lexer  |
+| 2001/xmlstatc.htm | hand-written tables used by historical lexer        |
+```
 
 ```
 $ ./classify.py --help
