@@ -4,7 +4,8 @@ UnicodeLexer
 Two implementations are stored here;
 one from 2016 and one from 2001.
 
-## 0: Highlights
+0: Highlights
+=============
 ANTLR4:
 ```
 | FILE              | CONTENTS                                            |
@@ -28,7 +29,7 @@ Historical:
 ```
 
 1: Codepoint classification grammar
-==============
+===================================
 2016 Automated Unicode codepoint classification ANTLR4 grammar writer.
 
 Python code to convert authoritative unicode.org resource files into
@@ -110,7 +111,7 @@ The resulting grammars include:
 * wiki.g4 (grammar which imports classify.g4)
 
 2: old 2001 XML Unicode
-==============
+=======================
 2001 directory has all historical files with ".htm" extensions
 and a Python script implementing the same tables for modern use.
 
