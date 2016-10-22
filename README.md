@@ -1,11 +1,11 @@
 UnicodeLexer
 ============
 
-* 1st set: all the files with ".htm" extensions.
+# All the files with ".htm" extensions.
 C code from 2001 implementing a very efficient
 Universal XML Unicode stream converter
 
-* 2nd set: an automated Unicode codepoint classification ANTLR grammar writer.
+# Automated Unicode codepoint classification ANTLR grammar writer.
 Python code to convert authoritative unicode.org resource files into
 a complete and commented grammar suitable for import into other grammars.
 
