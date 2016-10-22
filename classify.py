@@ -364,18 +364,25 @@ Automatically generated Unicode based wiki grammar."""
             print(self.table)
         return self
 
-    def test(self, sample):
+    def test(self, sample=None):
         if self.unittest:
-            table = self.table['class']
-            print("    test: %s" % (sample))
-            for u in [ord(c) for c in sample]:
-                a, b, c = [(u>>(7*i))&0x7f for i in range(3)]
-                C = table[self.base][c]
-                B = table[C][b]
-                A = table[B][a]
-                name = self.name[u] if u < 128 else "non-ASCII"
-                fmt = '0x%06x %3d %3d %3d %3d %3d %2d %s %s'
-                print(fmt % (u, c, b, a, C, B, A, self.keys[A], name))
+            if sample == None:
+                # 1. all ASCII
+                # 2. mixed with Chinese (CJK) characters
+                # Run "make" then "./classify.py -u" to see results.
+                # TODO Complete table population to classify CJK characters.
+                self.test(u"Hello world\n").test(u"Hello 愚公移山。\n")
+            else:
+                table = self.table['class']
+                print("    test: %s" % (sample))
+                for u in [ord(c) for c in sample]:
+                    a, b, c = [(u>>(7*i))&0x7f for i in range(3)]
+                    C = table[self.base][c]
+                    B = table[C][b]
+                    A = table[B][a]
+                    name = self.name[u] if u < 128 else "non-ASCII"
+                    fmt = '0x%06x %3d %3d %3d %3d %3d %2d %s %s'
+                    print(fmt % (u, c, b, a, C, B, A, self.keys[A], name))
         return self
 
     def shows(self):
@@ -397,8 +404,8 @@ if __name__ == "__main__":
         # Display internal data as flagged on the command-line.
         codepoint.shows()
 
-        # Run a couple of tests.
-        codepoint.test(u"Hello world\n").test(u"Hello 愚公移山。\n")
+        # Run unit tests.
+        codepoint.test()
 
         # Generate an ANTLR4 grammar
         codepoint.g4()

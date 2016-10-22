@@ -24,6 +24,10 @@ all: wiki.tokens
 	@echo "make finished"
 
 .PHONY:
+test: $(GRAMMARS)
+	./classify.py -u
+
+.PHONY:
 clean:
 	@echo $@
 	@rm -f $(SOURCES) $(TARGETS)
