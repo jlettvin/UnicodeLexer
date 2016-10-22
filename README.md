@@ -25,7 +25,8 @@ This code is new to 2016, and supersedes the 2001 code.
 
 TODO: Finish Python generation of classification table.
 This compiled table (in .c or .js JIT) may outperform
-other implementations including ANTLR4 grammar.
+other implementations including ANTLR4 grammar
+possibly by an order of magnitude.
 
 1: XML Unicode
 ==============
