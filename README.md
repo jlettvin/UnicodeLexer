@@ -12,7 +12,7 @@ ANTLR4:
 | ----------------- | --------------------------------------------------- |
 | classify.g4       | ANTLR4 import grammar for codepoint classification  |
 | classify.py       | Code to generate classify.g4                        |
-| wiki.g4           | Skeletal grammar importing classify.g4 for testing  |
+| hello.g4          | Skeletal grammar importing classify.g4 for testing  |
 | Makefile          | Script to download Unicode files, generate g4, test |
 | README.md         | This file                                           |
 ```
@@ -72,7 +72,7 @@ Concepts:
     It also provides Abbreviation Descriptions for each codepoint.
 
     Enhance (-e) causes additional rules to be moved
-    from the file wiki.g4 to the file classify.g4 where
+    from the file hello.g4 to the file classify.g4 where
     they can be imported into other grammars.
 
 Author: Jonathan D. Lettvin (jlettvin@gmail.com)
@@ -108,7 +108,7 @@ Process:
 
 The resulting grammars include:
 * classify.g4 (grammar identifying all legal codepoint classifications)
-* wiki.g4 (grammar which imports classify.g4)
+* hello.g4 (grammar which imports classify.g4)
 
 Once the internal Table in classify.py is finished,
 submitting a Unicode codepoint "u" to this lookup
