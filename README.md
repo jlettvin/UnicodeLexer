@@ -111,6 +111,8 @@ Legal:  Copyright(c) Jonathan D. Lettvin, All Rights Reserved
 License:GPL 3.0
 ```
 
+1.3: Instructions
+=================
 Running make downloads unicode authoritative files,
 produces the two grammars, and roughly tests functionality.
 
