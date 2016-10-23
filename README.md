@@ -14,10 +14,10 @@ ANTLR4:
 | classify.py       | Code to generate classify.g4                        |
 | ----------------- | --------------------------------------------------- |
 | hello0.g4         | Simple original g4 grammar for comparison test      |
-| hello0.py         | Test script for simple original g4 grammar          |
+| hello0.py         | Simple original g4 grammar test script              |
 | ----------------- | --------------------------------------------------- |
-| hello1.g4         | Simple classify grammar importing for testing       |
-| hello1.py         | Test script for simple classify grammar             |
+| hello1.g4         | Simple classify g4 grammar for import testing       |
+| hello1.py         | Simple classify g4 grammar test script              |
 | ----------------- | --------------------------------------------------- |
 | Makefile          | Script to download Unicode files, generate g4, test |
 | README.md         | This file                                           |
