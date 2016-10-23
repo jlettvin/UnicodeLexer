@@ -1,16 +1,16 @@
 /** 
-hello.g4
+hello1.g4
 Automatically generated Unicode based hello grammar.
  */ 
 
-grammar      hello; 
+grammar      hello1    ; 
 
-import       classify; 
+import       classify  ; 
 
-prog   : hi * EOF
+prog   : hello * EOF
 ; 
 
-hi     : 'hello' ID
+hello  : 'hello' ID
 ; 
 
 ID     : [a-z]+              // TODO classify rule

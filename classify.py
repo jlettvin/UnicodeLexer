@@ -4,7 +4,7 @@
 """classify.py
 
 Usage:
-    classify.py [-acektuz] [-v]
+    classify.py [-acekrtuz] [-v]
     classify.py (-h | --help)
     classify.py (--version)
 
@@ -13,6 +13,7 @@ Options:
     -c --showcount                  Show key counts
     -e --enhance                    Add WS and ID rules
     -k --showkeys                   Show key names
+    -r --reducerange                Decrease Unicode limit from 10FFFF to FFFF
     -t --showtables                 Show tables
     -u --unittest                   Run tests
     -z --zeroerror                  Use zero, not len
@@ -175,6 +176,8 @@ class Codepoint(dict):
             (codepoint, name, key, control) = [field[i] for i in [0, 1, 2, 10]]
             # convert hex codepoint string value to internal integer
             codepoint = int(codepoint, 0x10)
+            if self.reducerange and codepoint > 0xFFFF:
+                continue
             self.raw[codepoint] = key
             self.name[codepoint] = name.replace(' ', '_')
             # Unicode 1.0 named each character.  Unicode 3.0 does not.
@@ -326,18 +329,18 @@ License:GPL 3.0"""
         self.g4rule('ID' , "ID0 [ ID0 | N ] *  // hand-written rule", 1)
 
     def g4hello(self):
-        """hello.g4
+        """hello1.g4
 Automatically generated Unicode based hello grammar."""
-        with open('hello.g4', 'w+') as self.grammar:
+        with open('hello1.g4', 'w+') as self.grammar:
             self.g4echo('/** \n' + Codepoint.g4hello.__doc__ + '\n */', 1)
-            self.g4echo('grammar      hello;', 1)
-            self.g4echo('import       classify;', 1)
-            self.g4rule('prog', 'hi * EOF', 1)
+            self.g4echo('grammar      hello1    ;', 1)
+            self.g4echo('import       classify  ;', 1)
+            self.g4rule('prog', 'hello * EOF', 1)
 
             if not self.enhance:
                 self.g4enhance()
 
-            self.g4rule("hi", r"'hello' ID", 1)
+            self.g4rule("hello", r"'hello' ID", 1)
 
             if True:
                 self.g4rule("ID", r"[a-z]+              // TODO classify rule", 1)
