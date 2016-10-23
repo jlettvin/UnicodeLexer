@@ -149,7 +149,7 @@ class Codepoint(dict):
                 self.block[language] = [init, fini]
                 self.language.append(language)
                 if self.verbose:
-                    print("%06x..%06x %s" % (init, fini, language))
+                    print("%04x..%04x %s" % (init, fini, language))
 
         return self
 
@@ -290,8 +290,8 @@ License:GPL 3.0"""
             self.g4echo("\n;", 1)
 
             efmt = '%-6s : %s;'
-            rfmt = r'[ \u%06x-\u%06x ]  // %s'
-            sfmt = r'[ \u%06x          ]  // %s'
+            rfmt = r'[ \u%04x-\u%04x ]  // %s'
+            sfmt = r'[ \u%04x        ]  // %s'
             rsep = ['  \n     | ', '  \n       ']
             for k in sorted(self.keyRanges):
                 v = self.keyRanges[k]
@@ -342,9 +342,9 @@ Automatically generated Unicode based hello grammar."""
 
             self.g4rule("hello", r"'hello' ID", 1)
 
-            if True:
-                self.g4rule("ID", r"[a-z]+              // TODO classify rule", 1)
-                self.g4rule('WS', r"[ \t\r\n]+ -> skip  // TODO classify rule", 1)
+            if False:
+                self.g4rule("ID", r"[A-Za-z_] +          // TODO classify rule", 1)
+                self.g4rule('WS', r"[ \t\r\n] + -> skip  // TODO classify rule", 1)
         return self
 
     def g4echo(self, text="", nl=0):
@@ -410,14 +410,14 @@ Automatically generated Unicode based hello grammar."""
                     # This next line is the complete code for classifying.
                     A = T[T[T[S][(u>>14)&0x7f]][(u>>7)&0x7f]][u&0x7f]
                     name = self.name.get(u, "non-ASCII")
-                    print('%06x %s %s' % (u, self.keys[A], name))
+                    print('%04x %s %s' % (u, self.keys[A], name))
                     # The code below spreads the operation out to enable
                     # A better grasp of the 3 stage table dereference.
                     # a, b, c = [(u>>(7*i))&0x7f for i in range(3)]
                     # C = table[self.base][c]
                     # B = table[C][b]
                     # A = table[B][a]
-                    # fmt = '0x%06x %3d %3d %3d %3d %3d %2d %s %s'
+                    # fmt = '0x%04x %3d %3d %3d %3d %3d %2d %s %s'
                     # print(fmt % (u, c, b, a, C, B, A, self.keys[A], name))
         return self
 
@@ -455,7 +455,7 @@ class BarTest(TestCase):
             for u in [ord(c) for c in sample]:
                 A = T[T[T[S][(u>>14)&0x7f]][(u>>7)&0x7f]][u&0x7f]
                 #name = self.name.get(u, "non-ASCII")
-                #print('%06x %s %s' % (u, self.keys[A], name))
+                #print('%04x %s %s' % (u, self.keys[A], name))
 
         def setUp(self):
             pass
