@@ -39,8 +39,6 @@ Historical:
 ===================================
 2016 Automated Unicode codepoint classification ANTLR4 grammar writer.
 
-APOLOGY: classify grammar broke.  Debugging.  Will remove apology when done.
-
 Python code to convert authoritative unicode.org resource files into
 a complete and commented grammar suitable for import into other grammars.
 Similar tables are built within the python code for local testing.
@@ -51,6 +49,29 @@ This compiled table (in .c or .js JIT) may outperform
 other implementations including ANTLR4 grammar
 possibly by an order of magnitude.
 
+
+1.1: Makefile help
+==================
+```
+$ make help
+Makefile for "classify" grammar generator and tests
+Version 0.0.1
+
+Author: Jonathan D. Lettvin (jlettvin@gmail.com)
+Date:   20161023
+Legal:  Copyright(c) Jonathan D. Lettvin, All Rights Reserved
+License:GPL 3.0"""
+
+Usage:
+    make [all]        Download resources, Generate grammar, Test
+    make test         Run simple generator internal tests
+    make clean        Remove temporary and unnecessary files
+    make help         Display this text
+    make version      Display version of this Makefile
+```
+
+1.2: classify.py --help
+=======================
 ```
 $ ./classify.py --help
 classify.py

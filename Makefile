@@ -8,11 +8,11 @@
 # License:GPL 3.0"""
 #
 # Usage:
-# 	  make [all]				Download resources, Generate grammar, Test
-# 	  make test					Run simple generator internal tests
-# 	  make clean				Remove temporary and unnecessary files
-#     make help					Display this text
-#     make version				Display version of this Makefile
+#     make [all]        Download resources, Generate grammar, Test
+#     make test         Run simple generator internal tests
+#     make clean        Remove temporary and unnecessary files
+#     make help         Display this text
+#     make version      Display version of this Makefile
 
 MANIFEST= \
 	MANIFEST Makefile README.md \
