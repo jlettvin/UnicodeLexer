@@ -16,17 +16,18 @@ SOURCES= \
 
 GRAMMARS= \
 	classify.g4 \
-	hello.g4
+	hello.g4 \
+	hi.g4
 
 TARGETS= \
-	hello.tokens \
-	helloLexer.py \
-	helloLexer.tokens \
-	helloListener.py \
-	helloParser.py \
-	helloVisitor.py
+	hi.tokens			hello.tokens \
+	hiLexer.py			helloLexer.py \
+	hiLexer.tokens		helloLexer.tokens \
+	hiListener.py		helloListener.py \
+	hiParser.py			helloParser.py \
+	hiVisitor.py		helloVisitor.py
 
-all: hello.tokens
+all: hi.tokens hello.tokens
 	@echo "make finished"
 
 .PHONY:
@@ -36,33 +37,41 @@ test: $(GRAMMARS)
 .PHONY:
 clean:
 	@echo $@
-	@rm -f $(SOURCES) $(TARGETS)
+	@rm -f $(SOURCES) $(TARGETS) *.pyc
 
 .PHONY:
-UnicodeData.txt: FORCE
+UnicodeData.txt:
 	@echo $@
 	@wget -q -c -N $(FTP)UCD/latest/ucd/$@
 
 .PHONY:
-Blocks.txt: FORCE
+Blocks.txt:
 	@echo $@
 	@wget -q -c -N $(FTP)UCD/latest/ucd/$@
 
 .PHONY:
-PropertyValueAliases.txt: FORCE
+PropertyValueAliases.txt:
 	@echo $@
 	@wget -q -c -N $(FTP)UCD/latest/ucd/$@
 
 .PHONY:
-UnicodeData-3.0.0.html: FORCE
+UnicodeData-3.0.0.html:
 	@echo $@
 	@wget -q -c -N $(FTP)3.0-Update/$@
 
-FORCE:
+hi.tokens:
+	@echo $@
+	@$(antlr4) -Dlanguage=Python2 -visitor hi.g4
+	@echo "Test ordinary lexer"
+	@-echo "hello original" 	 | ./hi.py
+	@-echo "hello 愚公移山" 	 | ./hi.py
 
 hello.tokens: $(GRAMMARS) Makefile
 	@echo $@
 	@$(antlr4) -Dlanguage=Python2 -visitor hello.g4
+	@echo "Test classify lexer"
+	@-echo "hello classify" 	 | ./hello.py
+	@-echo "hello 愚公移山" 	 | ./hello.py
 
 classify.g4 hello.g4: classify.py $(SOURCES) Makefile
 	@echo $@

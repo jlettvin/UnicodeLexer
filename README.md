@@ -32,6 +32,8 @@ Historical:
 ===================================
 2016 Automated Unicode codepoint classification ANTLR4 grammar writer.
 
+APOLOGY: classify grammar broke.  Debugging.  Will remove apology when done.
+
 Python code to convert authoritative unicode.org resource files into
 a complete and commented grammar suitable for import into other grammars.
 Similar tables are built within the python code for local testing.

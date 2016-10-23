@@ -287,8 +287,8 @@ License:GPL 3.0"""
             self.g4echo("\n;", 1)
 
             efmt = '%-6s : %s;'
-            rfmt = r'[\u%06x-\u%06x]  // %s'
-            sfmt = r'[\u%06x         ]  // %s'
+            rfmt = r'[ \u%06x-\u%06x ]  // %s'
+            sfmt = r'[ \u%06x          ]  // %s'
             rsep = ['  \n     | ', '  \n       ']
             for k in sorted(self.keyRanges):
                 v = self.keyRanges[k]
@@ -321,7 +321,7 @@ License:GPL 3.0"""
             widened = "[ %-32s ]  // %s" % (pattern, source)
             self.g4rule(rule, widened, 1)
         self.g4comment('End of Unicode codepoint classification', 1)
-        self.g4rule('WS' , '[ Z ]              // hand-written rule', 1)
+        self.g4rule('WS' , '[ Z ] +            // hand-written rule', 1)
         self.g4rule("ID0", "[ L | '_' ]        // hand-written rule", 1)
         self.g4rule('ID' , "ID0 [ ID0 | N ] *  // hand-written rule", 1)
 
@@ -332,12 +332,16 @@ Automatically generated Unicode based hello grammar."""
             self.g4echo('/** \n' + Codepoint.g4hello.__doc__ + '\n */', 1)
             self.g4echo('grammar      hello;', 1)
             self.g4echo('import       classify;', 1)
-            self.g4rule('prog', 'hi * EOF', 2)
+            self.g4rule('prog', 'hi * EOF', 1)
 
             if not self.enhance:
                 self.g4enhance()
 
-            self.g4rule("hi", "'hello' ID")
+            self.g4rule("hi", r"'hello' ID", 1)
+
+            if True:
+                self.g4rule("ID", r"[a-z]+              // TODO classify rule", 1)
+                self.g4rule('WS', r"[ \t\r\n]+ -> skip  // TODO classify rule", 1)
         return self
 
     def g4echo(self, text="", nl=0):
