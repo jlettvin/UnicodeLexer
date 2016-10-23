@@ -101,7 +101,11 @@ class Codepoint(dict):
             split1 = [s.strip() for s in line.split('#')]
             split2 = [s.strip() for s in split1[0].split(';')]
             if len(split1) == 2:  # There is a rule for the name
-                self.combinations[split2[1]] = split1[1]
+                split3 = [s.strip() for s in split1[1].split('|')]
+                # Necessary for 16 bit Unicode, not for 21 bite
+                split3 = [s for s in split3 if s != 'Cn']
+                rule = ' | '.join(split3)
+                self.combinations[split2[1]] = rule
             else:  # No rule proposed
                 self.keyName[split2[1]] = split2[-1]
         self.report('Combinations', self.combinations)
@@ -290,8 +294,8 @@ License:GPL 3.0"""
             self.g4echo("\n;", 1)
 
             efmt = '%-6s : %s;'
-            rfmt = r'[ \u%04x-\u%04x ]  // %s'
-            sfmt = r'[ \u%04x        ]  // %s'
+            rfmt = r" '\u%04x'..'\u%04x'   // %s"
+            sfmt = r" '\u%04x'             // %s"
             rsep = ['  \n     | ', '  \n       ']
             for k in sorted(self.keyRanges):
                 v = self.keyRanges[k]
@@ -321,13 +325,14 @@ License:GPL 3.0"""
     def g4enhance(self):
         source = "from " + Codepoint.URI["name"];
         for rule, pattern in self.combinations.iteritems():
-            widened = "[ %-32s ]  // %s" % (pattern, source)
+            widened = "%-32s  // %s" % (pattern, source)
             self.g4rule(rule, widened, 1)
         self.g4comment('End of Unicode codepoint classification', 1)
         #self.g4rule('WS0', '[ \t\r\n]          // hand-written rule', 1)
-        self.g4rule('WS' , '[ Z ] +            // hand-written rule', 1)
-        self.g4rule("ID0", "[ L | '_' ]        // hand-written rule", 1)
-        self.g4rule('ID' , "ID0 [ ID0 | N ] *  // hand-written rule", 1)
+        self.g4rule('WS' , 'Z +        // hand-written rule', 1)
+        self.g4rule("ID0", "L | '_'    // hand-written rule", 1)
+        self.g4rule("ID1", "ID0 | N    // hand-written rule", 1)
+        self.g4rule('ID' , "ID0 ID1 *  // hand-written rule", 1)
 
     def g4hello(self):
         """hello1.g4
@@ -344,8 +349,11 @@ Automatically generated Unicode based hello grammar."""
             self.g4rule("hello", r"'hello' ID", 1)
 
             if False:
-                self.g4rule("ID", r"[A-Za-z_] +          // TODO classify rule", 1)
+                self.g4rule("WS1", r"Z | [\t\r\n]", 1)
+                self.g4rule("WS", r"WS1 + -> skip", 1)
+            else:
                 self.g4rule('WS', r"[ \t\r\n] + -> skip  // TODO classify rule", 1)
+
         return self
 
     def g4echo(self, text="", nl=0):

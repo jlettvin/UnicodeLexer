@@ -93,15 +93,15 @@ hello0.tokens: $(GRAMMARS) hello0.py Makefile
 	@echo $@
 	@$(antlr4) -Dlanguage=Python2 -visitor hello0.g4
 	@echo "Test ordinary lexer"
-	@-echo "hello original" 	 | ./hello0.py
-	@-echo "hello 愚公移山" 	 | ./hello0.py
+	@echo "hello original" 	 | ./hello0.py
+	@echo "hello 愚公移山" 	 | ./hello0.py
 
 hello1.tokens: $(GRAMMARS) hello1.py Makefile
 	@echo $@
 	@$(antlr4) -Dlanguage=Python2 -visitor hello1.g4
 	@echo "Test classify lexer"
-	@-echo "hello classify" 	 | ./hello1.py
-	@-echo "hello 愚公移山" 	 | ./hello1.py
+	@echo "hello classify" 	 | ./hello1.py
+	@echo "hello 愚公移山" 	 | ./hello1.py
 
 classify.g4 hello.g4: classify.py $(SOURCES) Makefile
 	@echo "$@ --reducerange is used until ANTLR goes 21 bit"
