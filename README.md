@@ -12,9 +12,16 @@ ANTLR4:
 | ----------------- | --------------------------------------------------- |
 | classify.g4       | ANTLR4 import grammar for codepoint classification  |
 | classify.py       | Code to generate classify.g4                        |
-| hello.g4          | Skeletal grammar importing classify.g4 for testing  |
+| ----------------- | --------------------------------------------------- |
+| hi.g4             | Simple original g4 grammar for comparison test      |
+| hi.py             | Test script for simple original g4 grammar          |
+| ----------------- | --------------------------------------------------- |
+| hello.g4          | Simple classify grammar importing for testing       |
+| hello.py          | Test script for simple classify grammar             |
+| ----------------- | --------------------------------------------------- |
 | Makefile          | Script to download Unicode files, generate g4, test |
 | README.md         | This file                                           |
+| ----------------- | --------------------------------------------------- |
 ```
 
 Historical:
