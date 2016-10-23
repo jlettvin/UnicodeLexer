@@ -324,7 +324,8 @@ License:GPL 3.0"""
             widened = "[ %-32s ]  // %s" % (pattern, source)
             self.g4rule(rule, widened, 1)
         self.g4comment('End of Unicode codepoint classification', 1)
-        self.g4rule('WS' , '[ Z ] +            // hand-written rule', 1)
+        #self.g4rule('WS0', '[ \t\r\n]          // hand-written rule', 1)
+        self.g4rule('WS' , '[ Z | WS0 ] +      // hand-written rule', 1)
         self.g4rule("ID0", "[ L | '_' ]        // hand-written rule", 1)
         self.g4rule('ID' , "ID0 [ ID0 | N ] *  // hand-written rule", 1)
 
