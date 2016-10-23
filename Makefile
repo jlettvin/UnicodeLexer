@@ -16,17 +16,17 @@ SOURCES= \
 
 GRAMMARS= \
 	classify.g4 \
-	wiki.g4
+	hello.g4
 
 TARGETS= \
-	wiki.tokens \
-	wikiLexer.py \
-	wikiLexer.tokens \
-	wikiListener.py \
-	wikiParser.py \
-	wikiVisitor.py
+	hello.tokens \
+	helloLexer.py \
+	helloLexer.tokens \
+	helloListener.py \
+	helloParser.py \
+	helloVisitor.py
 
-all: wiki.tokens
+all: hello.tokens
 	@echo "make finished"
 
 .PHONY:
@@ -60,10 +60,10 @@ UnicodeData-3.0.0.html: FORCE
 
 FORCE:
 
-wiki.tokens: $(GRAMMARS) Makefile
+hello.tokens: $(GRAMMARS) Makefile
 	@echo $@
-	@$(antlr4) -Dlanguage=Python2 -visitor wiki.g4
+	@$(antlr4) -Dlanguage=Python2 -visitor hello.g4
 
-classify.g4 wiki.g4: classify.py $(SOURCES) Makefile
+classify.g4 hello.g4: classify.py $(SOURCES) Makefile
 	@echo $@
 	@./classify.py --zeroerror --enhance

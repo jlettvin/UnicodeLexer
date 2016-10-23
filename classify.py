@@ -29,7 +29,7 @@ Concepts:
     It also provides Abbreviation Descriptions for each codepoint.
 
     Enhance (-e) causes additional rules to be moved
-    from the file wiki.g4 to the file classify.g4 where
+    from the file hello.g4 to the file classify.g4 where
     they can be imported into other grammars.
 
 Author: Jonathan D. Lettvin (jlettvin@gmail.com)
@@ -37,6 +37,19 @@ Date:   20161023
 Legal:  Copyright(c) Jonathan D. Lettvin, All Rights Reserved
 License:GPL 3.0
 """
+
+__module__     = "classify.py"
+__author__     = "Jonathan D. Lettvin"
+__copyright__  = "\
+Copyright(C) 2016 Jonathan D. Lettvin, All Rights Reserved"
+__credits__    = [ "Jonathan D. Lettvin" ]
+__license__    = "GPLv3"
+__version__    = "0.0.1"
+__maintainer__ = "Jonathan D. Lettvin"
+__email__      = "jlettvin@gmail.com"
+__contact__    = "jlettvin@gmail.com"
+__status__     = "Demonstration"
+__date__       = "20161022"
 
 from re     import (sub)
 from bs4    import (BeautifulSoup)
@@ -299,7 +312,7 @@ License:GPL 3.0"""
 
             if self.enhance:
                 self.g4enhance()
-        self.g4wiki()
+        self.g4hello()
         return self
 
     def g4enhance(self):
@@ -312,20 +325,19 @@ License:GPL 3.0"""
         self.g4rule("ID0", "[ L | '_' ]        // hand-written rule", 1)
         self.g4rule('ID' , "ID0 [ ID0 | N ] *  // hand-written rule", 1)
 
-    def g4wiki(self):
-        """wiki.g4
-Automatically generated Unicode based wiki grammar."""
-        with open('wiki.g4', 'w+') as self.grammar:
-            self.g4echo('/** \n' + Codepoint.g4wiki.__doc__ + '\n */', 1)
-            self.g4echo('grammar      wiki;\n', 1)
-            self.g4echo('import       classify;\n', 1)
-            self.g4rule('prog', 'ID *', 2)
+    def g4hello(self):
+        """hello.g4
+Automatically generated Unicode based hello grammar."""
+        with open('hello.g4', 'w+') as self.grammar:
+            self.g4echo('/** \n' + Codepoint.g4hello.__doc__ + '\n */', 1)
+            self.g4echo('grammar      hello;', 1)
+            self.g4echo('import       classify;', 1)
+            self.g4rule('prog', 'hi * EOF', 2)
 
             if not self.enhance:
                 self.g4enhance()
 
-            self.g4rule("DEFINE", "'&' ID '=' .*? ';'", 1)
-            self.g4rule("ENTITY", "'&' ID ';'", 1)
+            self.g4rule("hi", "'hello' ID")
         return self
 
     def g4echo(self, text="", nl=0):
@@ -381,7 +393,7 @@ Automatically generated Unicode based wiki grammar."""
                 # 2. mixed with Chinese (CJK) characters
                 # Run "make" then "./classify.py -u" to see results.
                 # TODO Complete table population to classify CJK characters.
-                self.test(u"Hello world\n").test(u"Hello 愚公移山。\n")
+                self.test(u"hello world\n").test(u"hello 愚公移山\n")
             else:
                 # What to do with non-empty samples
                 T = table = self.table['class']
@@ -407,6 +419,49 @@ Automatically generated Unicode based wiki grammar."""
 
 if __name__ == "__main__":
 
+    import sys, unittest, inspect, string
+
+    from cStringIO import StringIO
+    from contextlib import contextmanager
+
+    @contextmanager
+    def capture(command, *args, **kwargs):
+        """
+class BarTest(TestCase):
+  def test_and_capture(self):
+    with capture(callable, *args, **kwargs) as output:
+      self.assertEquals("Expected output", output)
+        """
+        out, sys.stdout = sys.stdout, StringIO()
+        try:
+            command(*args, **kwargs)
+            sys.stdout.seek(0)
+            yield sys.stdout.read()
+        finally:
+            sys.stdout = out
+
+    class TheTest(unittest.TestCase):
+
+        def classify(self, u):
+            T = table = TheTest.codepoint.table['class']
+            S = base  = TheTest.codepoint.base
+            for u in [ord(c) for c in sample]:
+                A = T[T[T[S][(u>>14)&0x7f]][(u>>7)&0x7f]][u&0x7f]
+                #name = self.name.get(u, "non-ASCII")
+                #print('%06x %s %s' % (u, self.keys[A], name))
+
+        def setUp(self):
+            pass
+
+        def tearDown(self):
+            pass
+
+        def test_001(self):
+            TheTest.codepoint.test(u"Hello world\n")
+
+        def test_002(self):
+            TheTest.codepoint.test(u"Hello 愚公移山。\n")
+
     def main():
         "main is the traditional module entrypoint"
 
@@ -415,17 +470,28 @@ if __name__ == "__main__":
             k.strip('-'): w
             for k, w in docopt(__doc__, version="0.0.1").iteritems()
         }
-        # Initialize it all.
+        if kwargs["verbose"]:
+            pprint(kwargs)
+
+        # Initialize and process.
         codepoint = Codepoint(**kwargs)
 
         # Display internal data as flagged on the command-line.
         codepoint.shows()
 
-        # Run unit tests.
-        codepoint.test()
-
         # Generate an ANTLR4 grammar
         codepoint.g4()
+
+        if codepoint.unittest:
+            # Run unit tests.
+            TheTest.codepoint = codepoint
+
+            # internal test
+            codepoint.test()
+
+            # using unittest
+            if kwargs["verbose"]:
+                unittest.main()
 
     main()
 
