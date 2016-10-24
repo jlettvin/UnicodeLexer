@@ -59,12 +59,12 @@ possibly by an order of magnitude.
 ```
 $ make help
 Makefile for "classify" grammar generator and tests
-Version 0.0.1
+Version 0.0.2
 
-Author: Jonathan D. Lettvin (jlettvin@gmail.com)
-Date:   20161023
-Legal:  Copyright(c) Jonathan D. Lettvin, All Rights Reserved
-License:GPL 3.0"""
+Author    : Jonathan D. Lettvin (jlettvin@gmail.com)
+Date      : 20161023
+Legal     : Copyright(c) Jonathan D. Lettvin, All Rights Reserved
+License   : GPL 3.0
 
 Usage:
     make [all]        Download resources, Generate grammar, Test
@@ -72,6 +72,8 @@ Usage:
     make clean        Remove temporary and unnecessary files
     make help         Display this text
     make version      Display version of this Makefile
+
+Description: See README.md
 ```
 
 1.2: classify.py --help
@@ -81,7 +83,7 @@ $ ./classify.py --help
 classify.py
 
 Usage:
-    classify.py [-acektuz] [-v]
+    classify.py [-acefktuz] [-v]
     classify.py (-h | --help)
     classify.py (--version)
 
@@ -89,6 +91,7 @@ Options:
     -a --showascii                  Show ASCII class/name
     -c --showcount                  Show key counts
     -e --enhance                    Add WS and ID rules
+    -f --full21bit                  Express full 21 bit range 0 to 10FFFF
     -k --showkeys                   Show key names
     -t --showtables                 Show tables
     -u --unittest                   Run tests
@@ -106,19 +109,53 @@ Concepts:
     It also provides Abbreviation Descriptions for each codepoint.
 
     Enhance (-e) causes additional rules to be moved
-    from the file hello1.g4 to the file classify.g4 where
+    from the file hello.g4 to the file classify.g4 where
     they can be imported into other grammars.
 
-Author: Jonathan D. Lettvin (jlettvin@gmail.com)
-Date:   20161023 
-Legal:  Copyright(c) Jonathan D. Lettvin, All Rights Reserved
-License:GPL 3.0
+Author  : Jonathan D. Lettvin (jlettvin@gmail.com)
+Date    : 20161023 
+Legal   : Copyright(c) Jonathan D. Lettvin, All Rights Reserved
+License : GPL 3.0
 ```
 
 1.3: Instructions
 =================
-Running make downloads unicode authoritative files,
-produces the two grammars, and roughly tests functionality.
+Quick:
+* $ make clean
+* $ make
+
+Expect output of make to be:
+```
+UnicodeData.txt
+Blocks.txt
+PropertyValueAliases.txt
+UnicodeData-3.0.0.html
+classify16.g4
+produce both 16 bit (ANTLR) and 21 bit (full21bit) grammars
+hello0.tokens
+Test ordinary lexer
+line 2:6 token recognition error at: '愚'
+line 2:7 token recognition error at: '公'
+line 2:8 token recognition error at: '移'
+line 2:9 token recognition error at: '山'
+line 3:0 missing ID at '<EOF>'
+[PASS] original: original
+[PASS] original: <missing ID>
+hello1.tokens
+Test classify lexer
+[PASS] classify: classify
+[PASS] classify: 愚公移山
+make finished.  Creating MANIFEST
+```
+
+Observe:
+* The four unicode.org files are downoaded.
+* The grammars are produced
+* hello0 (the ASCII grammar) is executed with one PASS and one FAIL.
+* hello1 (the class grammar) is executed with two PASSes
+* A manifest of working files is produced
+
+TODO: The [PASS] with &lt;missing ID&gt; is in error and needs correction.
 
 Requirements:
 

@@ -33,10 +33,10 @@ Concepts:
     from the file hello.g4 to the file classify.g4 where
     they can be imported into other grammars.
 
-Author: Jonathan D. Lettvin (jlettvin@gmail.com)
-Date:   20161023 
-Legal:  Copyright(c) Jonathan D. Lettvin, All Rights Reserved
-License:GPL 3.0
+Author  : Jonathan D. Lettvin (jlettvin@gmail.com)
+Date    : 20161023 
+Legal   : Copyright(c) Jonathan D. Lettvin, All Rights Reserved
+License : GPL 3.0
 """
 
 __module__     = "classify.py"
