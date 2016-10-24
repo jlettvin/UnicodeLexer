@@ -16,7 +16,7 @@ Options:
     -k --showkeys                   Show key names
     -t --showtables                 Show tables
     -u --unittest                   Run tests
-    -z --zeroerror                  Use zero, not len
+    -z --zeroerror                  Use zero, not len as ERROR table index
     -v --verbose                    Show verbose output
     -h --help                       Show this Usage message
     --version                       Show version
@@ -45,7 +45,7 @@ __copyright__  = "\
 Copyright(C) 2016 Jonathan D. Lettvin, All Rights Reserved"
 __credits__    = [ "Jonathan D. Lettvin" ]
 __license__    = "GPLv3"
-__version__    = "0.0.1"
+__version__    = "0.0.2"
 __maintainer__ = "Jonathan D. Lettvin"
 __email__      = "jlettvin@gmail.com"
 __contact__    = "jlettvin@gmail.com"
