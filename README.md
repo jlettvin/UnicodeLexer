@@ -95,7 +95,7 @@ Options:
     -k --showkeys                   Show key names
     -t --showtables                 Show tables
     -u --unittest                   Run tests
-    -z --zeroerror                  Use zero, not len
+    -z --zeroerror                  Use zero, not len as ERROR table index
     -v --verbose                    Show verbose output
     -h --help                       Show this Usage message
     --version                       Show version
