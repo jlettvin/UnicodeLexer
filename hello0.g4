@@ -18,3 +18,5 @@ hello  : 'hello' ID
 ID     : [A-Za-z_] +           ;
 
 WS     : [ \t\r\n] + -> skip   ;
+
+ErrorCharacter : . ;

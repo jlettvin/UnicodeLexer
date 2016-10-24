@@ -362,6 +362,8 @@ Automatically generated Unicode based hello grammar."""
             else:
                 self.g4rule('WS', r"[ \t\r\n] + -> skip  // TODO classify rule", 1)
 
+            self.g4rule('ErrorCharacter', '.' )
+
         return self
 
     def g4echo(self, text="", nl=0):

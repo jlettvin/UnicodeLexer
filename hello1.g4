@@ -16,3 +16,5 @@ hello  : 'hello' ID
 WS     : [ \t\r\n] + -> skip  // TODO classify rule
 ; 
 
+ErrorCharacter : .
+;

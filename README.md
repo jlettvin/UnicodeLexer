@@ -13,7 +13,7 @@ ANTLR4:
 | ----------------- | --------------------------------------------------- |
 | classify16.g4     | ANTLR4 import grammar for codepoint classification  |
 | classify21.g4     | 21 bit import grammar for codepoint classification  |
-| classify.py       | Code to generate classify.g4                        |
+| classify.py       | Code to generate classify*.g4                       |
 | ----------------- | --------------------------------------------------- |
 | hello0.g4         | Simple original g4 grammar for comparison test      |
 | hello0.py         | Simple original g4 grammar test script              |

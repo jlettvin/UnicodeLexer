@@ -22,8 +22,12 @@ class hello1ErrorListener(ErrorListener):
 """
 
 class hello1PrintListener(hello1Listener):
+
     def enterHello(self, ctx):
         print "[PASS] classify: %s" % (ctx.ID())
+
+    def enterCodepoint(self, ctx):
+        print "[FAIL] classify: %s" % (ctx.ID())
 
 if __name__ == "__main__":
 
