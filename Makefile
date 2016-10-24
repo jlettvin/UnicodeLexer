@@ -1,11 +1,11 @@
 #!/usr/bin/env make
 # Makefile for "classify" grammar generator and tests
-# Version 0.0.1
+# Version 0.0.2
 #
-# Author: Jonathan D. Lettvin (jlettvin@gmail.com)
-# Date:   20161023
-# Legal:  Copyright(c) Jonathan D. Lettvin, All Rights Reserved
-# License:GPL 3.0"""
+# Author    : Jonathan D. Lettvin (jlettvin@gmail.com)
+# Date      : 20161023
+# Legal     : Copyright(c) Jonathan D. Lettvin, All Rights Reserved
+# License   : GPL 3.0
 #
 # Usage:
 #     make [all]        Download resources, Generate grammar, Test
@@ -13,6 +13,8 @@
 #     make clean        Remove temporary and unnecessary files
 #     make help         Display this text
 #     make version      Display version of this Makefile
+#
+# Description: See README.md
 
 MANIFEST=                                   \
 	MANIFEST Makefile README.md             \
@@ -65,7 +67,7 @@ clean:
 	@echo $@
 	@rm -f MANIFEST
 	@$(foreach item, $(MANIFEST), echo $(item) >> MANIFEST;)
-	# Try: @ls -1 | sort MANIFEST MANIFEST - | uniq -u | xargs rm -f
+	@echo "Try: @ls -1 | sort MANIFEST MANIFEST - | uniq -u | xargs rm -f"
 	@rm -f $(SOURCES) $(TARGETS) *.pyc
 
 .PHONY:
@@ -92,15 +94,13 @@ hello0.tokens: $(GRAMMARS) hello0.py Makefile
 	@echo $@
 	@$(antlr4) -Dlanguage=Python2 -visitor hello0.g4
 	@echo "Test ordinary lexer"
-	@echo "hello original"   | ./hello0.py
-	@echo "hello 愚公移山"   | ./hello0.py
+	@echo "hello original\nhello 愚公移山"   | ./hello0.py
 
 hello1.tokens: $(GRAMMARS) hello1.py Makefile
 	@echo $@
 	@$(antlr4) -Dlanguage=Python2 -visitor hello1.g4
 	@echo "Test classify lexer"
-	@echo "hello classify"   | ./hello1.py
-	@echo "hello 愚公移山"   | ./hello1.py
+	@echo "hello classify\nhello 愚公移山"   | ./hello1.py
 
 classify16.g4 classify21.g4 hello1.g4: classify.py $(SOURCES) Makefile
 	@echo "$@"
