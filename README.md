@@ -8,9 +8,11 @@ one from 2016 and one from 2001.
 =============
 ANTLR4:
 ```
+| ----------------- | --------------------------------------------------- |
 | FILE              | CONTENTS                                            |
 | ----------------- | --------------------------------------------------- |
-| classify.g4       | ANTLR4 import grammar for codepoint classification  |
+| classify16.g4     | ANTLR4 import grammar for codepoint classification  |
+| classify21.g4     | 21 bit import grammar for codepoint classification  |
 | classify.py       | Code to generate classify.g4                        |
 | ----------------- | --------------------------------------------------- |
 | hello0.g4         | Simple original g4 grammar for comparison test      |
@@ -26,6 +28,7 @@ ANTLR4:
 
 Historical:
 ```
+| ----------------- | --------------------------------------------------- |
 | FILE              | CONTENTS                                            |
 | ----------------- | --------------------------------------------------- |
 | 2001/codepoint.py | Hand-written modern update of tables                |
@@ -33,6 +36,7 @@ Historical:
 | 2001/xmlextrn.htm | External names of historical lexer                  |
 | 2001/xmlmacro.htm | C macros implementing algorithms, historical lexer  |
 | 2001/xmlstatc.htm | Hand-written tables used by historical lexer        |
+| ----------------- | --------------------------------------------------- |
 ```
 
 1: Codepoint classification grammar

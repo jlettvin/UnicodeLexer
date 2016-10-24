@@ -14,34 +14,33 @@
 #     make help         Display this text
 #     make version      Display version of this Makefile
 
-MANIFEST= \
-	MANIFEST Makefile README.md \
-	classify.py classify.g4 \
-	hello.py hello.g4 hello0.py hello0.g4 \
-	2001 \
-	2001/codepoint.py \
+MANIFEST=                                   \
+	MANIFEST Makefile README.md             \
+	classify.py classify16.g4 classify21.g4 \
+	hello1.py hello1.g4 hello0.py hello0.g4 \
+	2001                                    \
+	2001/codepoint.py                       \
 	2001/xml.htm 2001/xmlextern.htm 2001/xmlmacro.htm 2001/xmlstatc.htm
 
 FTP=ftp://ftp.unicode.org/Public/
 
-SOURCES= 						\
-	UnicodeData.txt 			\
-	Blocks.txt 					\
-	PropertyValueAliases.txt 	\
-    UnicodeData-3.0.0.html
+SOURCES=                        \
+	UnicodeData.txt             \
+	Blocks.txt                  \
+	PropertyValueAliases.txt    \
+	UnicodeData-3.0.0.html
 
-GRAMMARS= 		\
-	classify.g4 \
-	hello0.g4	\
-	hello1.g4
+GRAMMARS=                                       \
+	classify16.g4           classify21.g4       \
+	hello0.g4               hello1.g4
 
-TARGETS= 										\
-	hello0.tokens			hello1.tokens 		\
-	hello0Lexer.py			hello1Lexer.py 		\
-	hello0Lexer.tokens		hello1Lexer.tokens 	\
-	hello0Listener.py		hello1Listener.py 	\
-	hello0Parser.py			hello1Parser.py 	\
-	hello0Visitor.py		hello1Visitor.py
+TARGETS=                                        \
+	hello0.tokens           hello1.tokens       \
+	hello0Lexer.py          hello1Lexer.py      \
+	hello0Lexer.tokens      hello1Lexer.tokens  \
+	hello0Listener.py       hello1Listener.py   \
+	hello0Parser.py         hello1Parser.py     \
+	hello0Visitor.py        hello1Visitor.py
 
 antlr4=java -jar /usr/local/lib/antlr-4.5.3-complete.jar
 
@@ -93,16 +92,18 @@ hello0.tokens: $(GRAMMARS) hello0.py Makefile
 	@echo $@
 	@$(antlr4) -Dlanguage=Python2 -visitor hello0.g4
 	@echo "Test ordinary lexer"
-	@echo "hello original" 	 | ./hello0.py
-	@echo "hello 愚公移山" 	 | ./hello0.py
+	@echo "hello original"   | ./hello0.py
+	@echo "hello 愚公移山"   | ./hello0.py
 
 hello1.tokens: $(GRAMMARS) hello1.py Makefile
 	@echo $@
 	@$(antlr4) -Dlanguage=Python2 -visitor hello1.g4
 	@echo "Test classify lexer"
-	@echo "hello classify" 	 | ./hello1.py
-	@echo "hello 愚公移山" 	 | ./hello1.py
+	@echo "hello classify"   | ./hello1.py
+	@echo "hello 愚公移山"   | ./hello1.py
 
-classify.g4 hello.g4: classify.py $(SOURCES) Makefile
-	@echo "$@ --reducerange is used until ANTLR goes 21 bit"
-	@./classify.py --zeroerror --enhance --reducerange
+classify16.g4 classify21.g4 hello1.g4: classify.py $(SOURCES) Makefile
+	@echo "$@"
+	@echo "produce both 16 bit (ANTLR) and 21 bit (full21bit) grammars"
+	@./classify.py --zeroerror --enhance
+	@./classify.py --zeroerror --enhance --full21bit

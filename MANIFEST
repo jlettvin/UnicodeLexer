@@ -2,9 +2,10 @@ MANIFEST
 Makefile
 README.md
 classify.py
-classify.g4
-hello.py
-hello.g4
+classify16.g4
+classify21.g4
+hello1.py
+hello1.g4
 hello0.py
 hello0.g4
 2001
